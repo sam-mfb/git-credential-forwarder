@@ -1,0 +1,19 @@
+{
+  "name": "gcm-forward",
+  "version": "0.0.1",
+  "description": "utilities for forwarding gcm commands from a docker container to a host gcm installation",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rimraf ./dist && tsc -p tsconfig.prod.json",
+    "start": "node bin/index.js"
+  },
+  "author": "Sam Davidoff",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.12.4",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "rimraf": "^5.0.5"
+  }
+}
