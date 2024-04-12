@@ -1,28 +1,25 @@
-import type { GitCredentialHelperOperation } from "../git-credential-types"
-import { isGitCredentialHelperOperation } from "../git-credential-types.guards"
 import { Result } from "../result"
-
-type CustomError = {
-  errorType: "generic" | "silent"
-  message: string
-}
+import { extractOperation } from "./extractOperation"
+import type {
+  CredentialHandlerOptions,
+  CredentialOperationHandler
+} from "./types"
+import type { GitCredentialHelperOperation } from "../git-credential-types"
 
 export function gitCredentialHelper(args: {
   argv: string[]
-  input: NodeJS.ReadStream
-  output: NodeJS.WriteStream
-  error: NodeJS.WriteStream
-  options?: {
-    // pass a debugger function for extra output, e.g., console.log()
-    debugger?: (message: string) => void
-    // VS Code's helper inserts a command before the standard git operation
-    vsCodeCompatible?: boolean
+  streams: {
+    input: NodeJS.ReadStream
+    output: NodeJS.WriteStream
+    error: NodeJS.WriteStream
   }
+  credentialOperationHandler: CredentialOperationHandler
+  options?: CredentialHandlerOptions
 }): void {
   const debug = args.options?.debugger ? args.options?.debugger : () => {}
 
   const operationResult = extractOperation(args.argv, {
-    expectedLocation: args.options?.vsCodeCompatible ? 3 : 2
+    expectedLocation: 2
   })
   if (Result.isFailure(operationResult)) {
     switch (operationResult.error.errorType) {
@@ -39,26 +36,42 @@ export function gitCredentialHelper(args: {
   }
   const operation = operationResult.value
   debug(`Received operation ${operation}`)
+
+  let rawInput = ""
+  args.streams.input.setEncoding("utf8")
+  args.streams.input.on("data", (data: string) => {
+    rawInput += data
+    if (rawInput.trim() === "" || rawInput.endsWith("\n\n")) {
+      args.streams.input.pause()
+      runCredentialOperationHandler({
+        operation: operation,
+        rawInput: rawInput,
+        credentialOperationHandler: args.credentialOperationHandler,
+        streams: args.streams,
+        options: args.options
+      })
+    }
+  })
+  args.streams.input.on("end", () => {
+    runCredentialOperationHandler({
+      operation: operation,
+      rawInput: rawInput,
+      credentialOperationHandler: args.credentialOperationHandler,
+      streams: args.streams,
+      options: args.options
+    })
+  })
 }
 
-function extractOperation(
-  argv: string[],
-  options: {
-    expectedLocation: number
+function runCredentialOperationHandler(args: {
+  operation: GitCredentialHelperOperation
+  rawInput: string
+  credentialOperationHandler: CredentialOperationHandler
+  streams: {
+    output: NodeJS.WriteStream
+    error: NodeJS.WriteStream
   }
-): Result<GitCredentialHelperOperation, CustomError> {
-  const operation = argv[options.expectedLocation]
-  if (typeof operation !== "string") {
-    return Result.failure({
-      errorType: "generic",
-      message: `No value found at expected operation location ${options.expectedLocation}`
-    })
-  }
-  if (!isGitCredentialHelperOperation(operation)) {
-    return Result.failure({
-      errorType: "silent",
-      message: `${operation} is not a currently supported operation`
-    })
-  }
-  return Result.success(operation)
+  options?: CredentialHandlerOptions
+}): void {
+  //
 }
