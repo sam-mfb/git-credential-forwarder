@@ -1,9 +1,6 @@
 import { Result } from "../result"
 import { extractOperation } from "./extractOperation"
-import type {
-  CredentialHandlerOptions,
-  CredentialOperationHandler
-} from "./types"
+import type { CredentialOperationHandler } from "./types"
 import type { GitCredentialHelperOperation } from "../git-credential-types"
 import { gitCredentialIoApi } from "../gitcredential-io"
 
@@ -19,9 +16,9 @@ export function gitCredentialHelper(args: {
     failure: () => void
   }
   credentialOperationHandler: CredentialOperationHandler
-  options?: CredentialHandlerOptions
+  debugger?: (str: string) => void
 }): void {
-  const debug = args.options?.debugger ? args.options?.debugger : () => {}
+  const debug = args.debugger ? args.debugger : () => {}
 
   debug(`Extracting git credential operation...`)
   const operationResult = extractOperation(args.argv, {
@@ -58,7 +55,7 @@ export function gitCredentialHelper(args: {
         credentialOperationHandler: args.credentialOperationHandler,
         streams: args.streams,
         onExit: args.onExit,
-        options: args.options
+        debugger: args.debugger
       })
     }
   })
@@ -71,7 +68,7 @@ export function gitCredentialHelper(args: {
       credentialOperationHandler: args.credentialOperationHandler,
       streams: args.streams,
       onExit: args.onExit,
-      options: args.options
+      debugger: args.debugger
     })
   })
 }
@@ -88,9 +85,9 @@ function runCredentialOperationHandler(args: {
     success: () => void
     failure: () => void
   }
-  options?: CredentialHandlerOptions
+  debugger?: (str: string) => void
 }): void {
-  const debug = args.options?.debugger ? args.options?.debugger : () => {}
+  const debug = args.debugger ? args.debugger : () => {}
 
   const inputResult = gitCredentialIoApi.deserialize(args.rawInput)
   if (Result.isFailure(inputResult)) {
@@ -102,11 +99,7 @@ function runCredentialOperationHandler(args: {
     `Running credential handler with operation ${args.operation} and input ${input}`
   )
   args
-    .credentialOperationHandler(
-      args.operation,
-      input,
-      args.options?.vsCodeCompatible
-    )
+    .credentialOperationHandler(args.operation, input)
     .then(output => {
       const serializedOutput = gitCredentialIoApi.serialize(output)
       debug(`Received credential output ${serializedOutput}`)
