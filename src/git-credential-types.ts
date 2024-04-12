@@ -1,4 +1,13 @@
 /*
+ * Enum-like constant for holding git credential helper operation strings
+ */
+export const gitCredentialHelperOperation = {
+  GET: "get",
+  STORE: "store",
+  ERASE: "erase"
+} as const
+
+/*
  * Operations that git credential helper may receive per https://git-scm.com/docs/gitcredentials
  * get - Return a matching credential, if any exists.
  * store - Store the credential, if applicable to the helper.
@@ -9,7 +18,9 @@
  * - If it does not support the requested operation (e.g., a read-only store or generator), it should silently ignore the request.
  * - If a helper receives any other operation, it should silently ignore the request. This leaves room for future operations to be added (older helpers will just ignore the new requests).
  */
-export type GitCredentialHelperOperation = "get" | "store" | "erase"
+export type GitCredentialHelperOperation = ConstRecordToType<
+  typeof gitCredentialHelperOperation
+>
 
 /*
  * Expected output of git credential helper operations per https://git-scm.com/docs/gitcredentials
@@ -22,9 +33,18 @@ export type GitCredentialHelperOperation = "get" | "store" | "erase"
  */
 export type GitCredentialHelperOutput<
   TOperation extends GitCredentialHelperOperation
-> = TOperation extends "get"
+> = TOperation extends (typeof gitCredentialHelperOperation)["GET"]
   ? GitCredentialInputOutput & { quit?: true | 1 }
   : null
+
+/*
+ * Enum-like constant for holding git credential action strings
+ */
+export const gitCredentialAction = {
+  FILL: "fill",
+  APPROVE: "approve",
+  REJECT: "reject"
+} as const
 
 /*
  * Actions that git-credential (as opposed to a git credential helper) may receive per https://git-scm.com/docs/git-credential
@@ -32,7 +52,7 @@ export type GitCredentialHelperOutput<
  * approve - git-credential will send the description to any configured credential helpers, which may store the credential for later use.\
  * action is reject - git-credential will send the description to any configured credential helpers, which may erase any stored credentials matching the description.
  */
-export type GitCredentialAction = "fill" | "approve" | "reject"
+export type GitCredentialAction = ConstRecordToType<typeof gitCredentialAction>
 
 /*
  * Expected output of git credential actions per https://git-scm.com/docs/git-credential
@@ -40,7 +60,9 @@ export type GitCredentialAction = "fill" | "approve" | "reject"
  * - If the action is approve or reject, no output should be emitted.
  */
 export type GitCredentialOutput<TAction extends GitCredentialAction> =
-  TAction extends "fill" ? GitCredentialInputOutput : null
+  TAction extends (typeof gitCredentialAction)["FILL"]
+    ? GitCredentialInputOutput
+    : null
 
 /*
  * Input/output format for git-credential and git credential helpers as specified here https://git-scm.com/docs/git-credential
@@ -91,3 +113,7 @@ export type GitCredentialInputOutput = {
    */
   wwwauth?: string[]
 }
+
+type ConstRecordToType<T extends Record<string, string>> = {
+  [K in keyof T]: T[K]
+}[keyof T]
