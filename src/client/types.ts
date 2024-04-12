@@ -5,7 +5,8 @@ import type {
 
 export type CredentialOperationHandler = (
   operation: GitCredentialHelperOperation,
-  input: GitCredentialInputOutput
+  input: GitCredentialInputOutput,
+  vsCodeCompatible?: boolean
 ) => Promise<GitCredentialInputOutput>
 
 export type CredentialHandlerOptions = {
