@@ -6,6 +6,8 @@ import type {
 
 import http from "http"
 import { isGitCredentialInputOutput } from "./git-credential-types.guards"
+import { gitCredentialIoApi } from "./gitcredential-io"
+import { Result } from "./result"
 
 /*
  * This is the body format (deserialized) that VS Code's Dev Container
@@ -42,13 +44,12 @@ export function buildCredentialForwarder(deps: {
           })
           res.on("error", reject)
           res.on("end", () => {
-            const outputDeserialized = JSON.parse(outputRaw)
-            if (isGitCredentialInputOutput(outputDeserialized)) {
-              resolve(outputDeserialized)
+            const outputDeserializedResult =
+              gitCredentialIoApi.deserialize(outputRaw)
+            if (Result.isSuccess(outputDeserializedResult)) {
+              resolve(outputDeserializedResult.value)
             } else {
-              reject(
-                `Deserialized output not in the expected format. Output: ${outputDeserialized}`
-              )
+              reject(outputDeserializedResult.error)
             }
           })
         }
@@ -77,6 +78,6 @@ function toVsCodeReqBody(body: RequestBody): VsCodeRequestBody {
   const VS_CODE_GCH_PREFIX = "git-credential-helper"
   return {
     args: [VS_CODE_GCH_PREFIX, body.operation],
-    stdin: JSON.stringify(body.input)
+    stdin: gitCredentialIoApi.serialize(body.input)
   }
 }

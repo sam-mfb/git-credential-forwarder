@@ -27,7 +27,7 @@ const gitCredentialHelper = buildGitCredentialHelper({
     }
   },
   credentialOperationHandler: credentialForwarder,
-  debugger: str => console.log(str)
+  debugger: str => process.stderr.write(str)
 })
 
 gitCredentialHelper(process.argv)
