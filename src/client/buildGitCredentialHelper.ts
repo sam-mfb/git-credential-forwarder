@@ -97,7 +97,9 @@ function runCredentialOperationHandler(args: {
   const input = inputResult.value
 
   debug(
-    `Running credential handler with operation ${args.operation} and input ${input}`
+    `Running credential handler with operation ${
+      args.operation
+    } and input ${JSON.stringify(input)}`
   )
   args
     .credentialOperationHandler(args.operation, input)

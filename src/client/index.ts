@@ -1,4 +1,4 @@
-import { buildCredentialForwarder } from "../buildCredentialForwarder"
+import { buildCredentialForwarder } from "./buildCredentialForwarder"
 import { buildGitCredentialHelper } from "./buildGitCredentialHelper"
 
 const socketPath = process.env.REMOTE_CONTAINERS_IPC
@@ -27,7 +27,7 @@ const gitCredentialHelper = buildGitCredentialHelper({
     }
   },
   credentialOperationHandler: credentialForwarder,
-  debugger: str => process.stderr.write(str)
+  debugger: str => process.stderr.write(str + "\n")
 })
 
 gitCredentialHelper(process.argv)

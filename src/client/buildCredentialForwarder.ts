@@ -1,13 +1,12 @@
-import type { CredentialOperationHandler } from "./client/types"
+import type { CredentialOperationHandler } from "./types"
 import type {
   GitCredentialHelperOperation,
   GitCredentialInputOutput
-} from "./git-credential-types"
+} from "../git-credential-types"
 
 import http from "http"
-import { isGitCredentialInputOutput } from "./git-credential-types.guards"
-import { gitCredentialIoApi } from "./gitcredential-io"
-import { Result } from "./result"
+import { gitCredentialIoApi } from "../gitcredential-io"
+import { Result } from "../result"
 
 /*
  * This is the body format (deserialized) that VS Code's Dev Container
