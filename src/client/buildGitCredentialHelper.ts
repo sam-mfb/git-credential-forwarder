@@ -4,8 +4,7 @@ import type { CredentialOperationHandler } from "./types"
 import type { GitCredentialHelperOperation } from "../git-credential-types"
 import { gitCredentialIoApi } from "../gitcredential-io"
 
-export function gitCredentialHelper(args: {
-  argv: string[]
+export function buildGitCredentialHelper(deps: {
   streams: {
     input: NodeJS.ReadStream
     output: NodeJS.WriteStream
@@ -17,60 +16,62 @@ export function gitCredentialHelper(args: {
   }
   credentialOperationHandler: CredentialOperationHandler
   debugger?: (str: string) => void
-}): void {
-  const debug = args.debugger ? args.debugger : () => {}
+}): (argv: string[]) => void {
+  return argv => {
+    const debug = deps.debugger ? deps.debugger : () => {}
 
-  debug(`Extracting git credential operation...`)
-  const operationResult = extractOperation(args.argv, {
-    expectedLocation: 2
-  })
-  if (Result.isFailure(operationResult)) {
-    switch (operationResult.error.errorType) {
-      case "generic":
-        debug(operationResult.error.message)
-        throw new Error(operationResult.error.message)
-      case "silent":
-        debug(operationResult.error.message)
-        return
-      default:
-        operationResult.error.errorType satisfies never
-        return
+    debug(`Extracting git credential operation...`)
+    const operationResult = extractOperation(argv, {
+      expectedLocation: 2
+    })
+    if (Result.isFailure(operationResult)) {
+      switch (operationResult.error.errorType) {
+        case "generic":
+          debug(operationResult.error.message)
+          throw new Error(operationResult.error.message)
+        case "silent":
+          debug(operationResult.error.message)
+          return
+        default:
+          operationResult.error.errorType satisfies never
+          return
+      }
     }
-  }
-  const operation = operationResult.value
-  debug(`Received operation ${operation}`)
+    const operation = operationResult.value
+    debug(`Received operation ${operation}`)
 
-  let rawInput = ""
-  args.streams.input.setEncoding("utf8")
-  args.streams.input.on("data", (data: string) => {
-    debug(`Received input data: ${data}`)
-    rawInput += data
-    if (rawInput.trim() === "" || rawInput.endsWith("\n\n")) {
-      debug(`Pausing input stream...`)
-      args.streams.input.pause()
+    let rawInput = ""
+    deps.streams.input.setEncoding("utf8")
+    deps.streams.input.on("data", (data: string) => {
+      debug(`Received input data: ${data}`)
+      rawInput += data
+      if (rawInput.trim() === "" || rawInput.endsWith("\n\n")) {
+        debug(`Pausing input stream...`)
+        deps.streams.input.pause()
+        debug(`Running credential operation handler...`)
+        runCredentialOperationHandler({
+          operation: operation,
+          rawInput: rawInput,
+          credentialOperationHandler: deps.credentialOperationHandler,
+          streams: deps.streams,
+          onExit: deps.onExit,
+          debugger: deps.debugger
+        })
+      }
+    })
+    deps.streams.input.on("end", () => {
+      debug(`Input stream ended`)
       debug(`Running credential operation handler...`)
       runCredentialOperationHandler({
         operation: operation,
         rawInput: rawInput,
-        credentialOperationHandler: args.credentialOperationHandler,
-        streams: args.streams,
-        onExit: args.onExit,
-        debugger: args.debugger
+        credentialOperationHandler: deps.credentialOperationHandler,
+        streams: deps.streams,
+        onExit: deps.onExit,
+        debugger: deps.debugger
       })
-    }
-  })
-  args.streams.input.on("end", () => {
-    debug(`Input stream ended`)
-    debug(`Running credential operation handler...`)
-    runCredentialOperationHandler({
-      operation: operation,
-      rawInput: rawInput,
-      credentialOperationHandler: args.credentialOperationHandler,
-      streams: args.streams,
-      onExit: args.onExit,
-      debugger: args.debugger
     })
-  })
+  }
 }
 
 function runCredentialOperationHandler(args: {
