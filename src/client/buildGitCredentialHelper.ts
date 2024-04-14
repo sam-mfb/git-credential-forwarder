@@ -1,6 +1,6 @@
 import { Result } from "../result"
 import { extractOperation } from "./extractOperation"
-import type { CredentialOperationHandler } from "./types"
+import type { CredentialOperationHandler } from "../types"
 import type { GitCredentialHelperOperation } from "../git-credential-types"
 import { gitCredentialIoApi } from "../gitcredential-io"
 

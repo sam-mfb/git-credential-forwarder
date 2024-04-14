@@ -1,4 +1,4 @@
-import type { CredentialOperationHandler } from "./types"
+import type { CredentialOperationHandler } from "../types"
 import type {
   GitCredentialHelperOperation,
   GitCredentialInputOutput
