@@ -16,11 +16,11 @@ export const gitCredentialIoApi = {
     }
   },
   serialize: (io: GitCredentialInputOutput): string => {
-    return JSON.stringify(io)
+    return jsonToRawIo(io)
   }
 }
 
-function rawIoToJson(io: string): Record<string, any> {
+function rawIoToJson(io: string): Record<string, unknown> {
   const lines = io.split("\n") // Split the input into lines
   const result: { [key: string]: string } = {} // Initialize an empty object to hold the key-value pairs
 
@@ -36,4 +36,18 @@ function rawIoToJson(io: string): Record<string, any> {
   })
 
   return result
+}
+
+function jsonToRawIo(json: Record<string, unknown>): string {
+  const result: string[] = [] // Initialize an empty array to hold the key-value pairs
+
+  for (const key in json) {
+    if (json.hasOwnProperty(key)) {
+      // Check if the key is actually a property of the object and not from its prototype chain
+      const value = json[key]
+      result.push(`${key}=${value}`) // Format as 'key=value' and add to the result array
+    }
+  }
+
+  return result.join("\n") // Join all elements of the array with a newline character
 }
