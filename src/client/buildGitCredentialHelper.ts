@@ -38,12 +38,12 @@ export function buildGitCredentialHelper(deps: {
       }
     }
     const operation = operationResult.value
-    debug(`Received operation ${operation}`)
+    debug(`Received operation "${operation}"`)
 
     let rawInput = ""
     deps.streams.input.setEncoding("utf8")
     deps.streams.input.on("data", (data: string) => {
-      debug(`Received input data: ${data}`)
+      debug(`Received input data:\n${data}`)
       rawInput += data
       if (rawInput.trim() === "" || rawInput.endsWith("\n\n")) {
         debug(`Pausing input stream...`)
@@ -97,21 +97,21 @@ function runCredentialOperationHandler(args: {
   const input = inputResult.value
 
   debug(
-    `Running credential handler with operation ${
+    `Running credential handler with operation "${
       args.operation
-    } and input ${JSON.stringify(input)}`
+    }" and input "${JSON.stringify(input)}"`
   )
   args
     .credentialOperationHandler(args.operation, input)
     .then(output => {
       const serializedOutput = gitCredentialIoApi.serialize(output)
       debug(`Received credential output ${serializedOutput}`)
-      args.streams.output.write(JSON.stringify(serializedOutput))
+      args.streams.output.write(serializedOutput)
       debug(`Exiting on success...`)
       args.onExit.success()
     })
     .catch(err => {
-      debug(`Credential handler error ${err}`)
+      debug(`Credential handler error "${err}"`)
       args.streams.error.write(JSON.stringify(err))
       debug(`Exiting on failure...`)
       args.onExit.failure()
