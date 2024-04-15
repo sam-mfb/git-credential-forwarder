@@ -32,7 +32,7 @@ export function buildCredentialReceiver(deps: {
       })
       req.on("end", () => {
         const deserializedBody = JSON.parse(rawData.join(""))
-        debug(`Received body: "${deserializedBody.toString()}"`)
+        debug(`Received body: "${rawData.join("")}"`)
         let credentialRequestBody: CredentialRequestBody
         if (isVsCodeCredentialRequestBody(deserializedBody)) {
           credentialRequestBody = toCredReqBody(deserializedBody)
@@ -51,7 +51,7 @@ export function buildCredentialReceiver(deps: {
           )
           .then(
             output => {
-              debug(`Received output: "${output}"`)
+              debug(`Received output: "${JSON.stringify(output)}"`)
               res.writeHead(200)
               res.end(gitCredentialIoApi.serialize(output))
             },
