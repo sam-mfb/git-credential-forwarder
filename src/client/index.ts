@@ -1,11 +1,7 @@
 import { buildCredentialForwarder } from "./buildCredentialForwarder"
 import { buildGitCredentialHelper } from "./buildGitCredentialHelper"
 
-const SOCK_PATH = process.env.GCH_FWD_IPC
-if (!SOCK_PATH) {
-  console.error("Socket path environment variable not configured.")
-  process.exit(1)
-}
+const result = parseServerInfo(process.env.GIT_CREDENTIAL_FORWARDER_SERVER)
 
 const credentialForwarder = buildCredentialForwarder({
   socketPath: SOCK_PATH,

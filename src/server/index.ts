@@ -1,10 +1,11 @@
+import { ServerType } from "../types"
 import { buildCredentialQuerier } from "./buildCredentialQuerier"
 import { Deps, buildCredentialReceiver } from "./buildCredentialReceiver"
 import { findAvailablePort } from "./findAvailablePort"
 
 const LOCALHOST = "127.0.0.1"
 
-let serverType: "ipc" | "tcp" = "tcp"
+let serverType: ServerType = "tcp"
 
 let socket = ""
 if (process.env.GCH_FWD_IPC) {

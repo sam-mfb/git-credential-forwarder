@@ -1,6 +1,7 @@
 import type {
   CredentialOperationHandler,
   CredentialRequestBody,
+  ServerType,
   VsCodeCredentialRequestBody
 } from "../types"
 import type { GitCredentialInputOutput } from "../git-credential-types"
@@ -9,36 +10,54 @@ import http from "http"
 import { gitCredentialIoApi } from "../gitcredential-io"
 import { Result } from "../result"
 
-export function buildCredentialForwarder(deps: {
-  socketPath: string
-  vsCodeCompatible: boolean
-}): CredentialOperationHandler {
+export function buildCredentialForwarder(
+  deps: {
+    type: ServerType
+    vsCodeCompatible: boolean
+  } & (
+    | {
+        type: "ipc"
+        socketPath: string
+      }
+    | {
+        type: "tcp"
+        host: string
+        port: number
+      }
+  )
+): CredentialOperationHandler {
   return (operation, input) => {
     return new Promise<GitCredentialInputOutput>((resolve, reject) => {
-      const req = http.request(
-        {
-          socketPath: deps.socketPath,
-          path: "/",
-          method: "POST"
-        },
-        res => {
-          let outputRaw: string = ""
-          res.setEncoding("utf8")
-          res.on("data", (chunk: string) => {
-            outputRaw += chunk
-          })
-          res.on("error", reject)
-          res.on("end", () => {
-            const outputDeserializedResult =
-              gitCredentialIoApi.deserialize(outputRaw)
-            if (Result.isSuccess(outputDeserializedResult)) {
-              resolve(outputDeserializedResult.value)
-            } else {
-              reject(outputDeserializedResult.error)
-            }
-          })
-        }
-      )
+      const requestOptions: http.RequestOptions = {
+        path: "/",
+        method: "POST"
+      }
+      switch (deps.type) {
+        case "ipc":
+          requestOptions.socketPath = deps.socketPath
+          break
+        case "tcp":
+          requestOptions.port = deps.port
+          requestOptions.host = deps.host
+          break
+      }
+      const req = http.request(requestOptions, res => {
+        let outputRaw: string = ""
+        res.setEncoding("utf8")
+        res.on("data", (chunk: string) => {
+          outputRaw += chunk
+        })
+        res.on("error", reject)
+        res.on("end", () => {
+          const outputDeserializedResult =
+            gitCredentialIoApi.deserialize(outputRaw)
+          if (Result.isSuccess(outputDeserializedResult)) {
+            resolve(outputDeserializedResult.value)
+          } else {
+            reject(outputDeserializedResult.error)
+          }
+        })
+      })
 
       req.on("error", reject)
       const requestBody = {

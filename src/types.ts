@@ -3,6 +3,8 @@ import type {
   GitCredentialInputOutput
 } from "./git-credential-types"
 
+export type ServerType = "ipc" | "tcp"
+
 export type CredentialOperationHandler = (
   operation: GitCredentialHelperOperation,
   input: GitCredentialInputOutput

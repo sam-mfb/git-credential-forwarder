@@ -3,6 +3,7 @@ import http from "http"
 import {
   CredentialOperationHandler,
   CredentialRequestBody,
+  ServerType,
   VsCodeCredentialRequestBody
 } from "../types"
 import { gitCredentialIoApi } from "../gitcredential-io"
@@ -17,6 +18,7 @@ import { promisify } from "util"
 const unlinkAsync = promisify(fs.unlink)
 
 type DepsBase = {
+  type: ServerType
   credentialOperationHandler: CredentialOperationHandler
   debugger?: (str: string) => void
 }
