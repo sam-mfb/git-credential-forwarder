@@ -1,14 +1,14 @@
 import { buildCredentialForwarder } from "./buildCredentialForwarder"
 import { buildGitCredentialHelper } from "./buildGitCredentialHelper"
 
-const socketPath = process.env.REMOTE_CONTAINERS_IPC
-if (!socketPath) {
+const SOCK_PATH = process.env.GCH_FWD_IPC
+if (!SOCK_PATH) {
   console.error("Socket path environment variable not configured.")
   process.exit(1)
 }
 
 const credentialForwarder = buildCredentialForwarder({
-  socketPath,
+  socketPath: SOCK_PATH,
   vsCodeCompatible: true
 })
 

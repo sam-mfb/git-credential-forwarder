@@ -1,27 +1,13 @@
-import type { CredentialOperationHandler } from "./types"
 import type {
-  GitCredentialHelperOperation,
-  GitCredentialInputOutput
-} from "../git-credential-types"
+  CredentialOperationHandler,
+  CredentialRequestBody,
+  VsCodeCredentialRequestBody
+} from "../types"
+import type { GitCredentialInputOutput } from "../git-credential-types"
 
 import http from "http"
 import { gitCredentialIoApi } from "../gitcredential-io"
 import { Result } from "../result"
-
-/*
- * This is the body format (deserialized) that VS Code's Dev Container
- * extension expects, so it needs to be used for compatibility with
- * that service
- */
-type VsCodeRequestBody = {
-  args: string[]
-  stdin: string
-}
-
-type RequestBody = {
-  operation: GitCredentialHelperOperation
-  input: GitCredentialInputOutput
-}
 
 export function buildCredentialForwarder(deps: {
   socketPath: string
@@ -73,7 +59,9 @@ export function buildCredentialForwarder(deps: {
  * expects. It appears to require a specific body format as well as a specific
  * prefix-type argument, presumably because its service does more than one thing
  */
-function toVsCodeReqBody(body: RequestBody): VsCodeRequestBody {
+function toVsCodeReqBody(
+  body: CredentialRequestBody
+): VsCodeCredentialRequestBody {
   const VS_CODE_GCH_PREFIX = "git-credential-helper"
   return {
     args: [VS_CODE_GCH_PREFIX, body.operation],
