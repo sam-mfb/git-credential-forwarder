@@ -16,11 +16,25 @@ import { promisify } from "util"
 
 const unlinkAsync = promisify(fs.unlink)
 
-export function buildCredentialReceiver(deps: {
-  socketPath: string
+type DepsBase = {
   credentialOperationHandler: CredentialOperationHandler
   debugger?: (str: string) => void
-}): () => Promise<void> {
+}
+
+type Deps = DepsBase &
+  (
+    | {
+        type: "ipc"
+        socketPath: string
+      }
+    | {
+        type: "tcp"
+        host: string
+        port: number
+      }
+  )
+
+export function buildCredentialReceiver(deps: Deps): () => Promise<void> {
   return async () => {
     const debug = deps.debugger ? deps.debugger : () => {}
 
@@ -63,17 +77,25 @@ export function buildCredentialReceiver(deps: {
       })
     })
 
-    try {
-      await unlinkAsync(deps.socketPath)
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-        throw new Error(`Error removing old socket: ${error}`)
-      }
+    switch (deps.type) {
+      case "ipc":
+        try {
+          await unlinkAsync(deps.socketPath)
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+            throw new Error(`Error removing old socket: ${error}`)
+          }
+        }
+        debug(`Starting IPC server listening on socket ${deps.socketPath}`)
+        server.listen(deps.socketPath)
+        break
+      case "tcp":
+        debug(`Starting TCP server listening on ${deps.host}:${deps.port}`)
+        server.listen(deps.host, deps.port)
+        break
+      default:
+        deps satisfies never
     }
-
-    debug(`Starting server listening on ${deps.socketPath}`)
-
-    server.listen(deps.socketPath)
   }
 }
 
