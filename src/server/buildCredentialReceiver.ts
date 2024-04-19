@@ -21,7 +21,7 @@ type DepsBase = {
   debugger?: (str: string) => void
 }
 
-type Deps = DepsBase &
+export type Deps = DepsBase &
   (
     | {
         type: "ipc"
@@ -91,7 +91,7 @@ export function buildCredentialReceiver(deps: Deps): () => Promise<void> {
         break
       case "tcp":
         debug(`Starting TCP server listening on ${deps.host}:${deps.port}`)
-        server.listen(deps.host, deps.port)
+        server.listen(deps.port, deps.host)
         break
       default:
         deps satisfies never
