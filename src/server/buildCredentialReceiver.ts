@@ -72,6 +72,7 @@ export function buildCredentialReceiver(deps: {
     }
 
     debug(`Starting server listening on ${deps.socketPath}`)
+
     server.listen(deps.socketPath)
   }
 }
