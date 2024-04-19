@@ -1,7 +1,7 @@
 {
-  "name": "gcm-forward",
-  "version": "0.0.1",
-  "description": "utilities for forwarding gcm commands from a docker container to a host gcm installation",
+  "name": "git-credential-forwarder",
+  "version": "0.0.2",
+  "description": "utilities for forwarding git credential helper commands to another git installation (e.g. container to host)",
   "main": "dist/index.js",
   "scripts": {
     "build": "rimraf ./dist && tsc -p tsconfig.prod.json",
@@ -11,9 +11,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.12.4",
-    "typescript": "^5.0.0"
-  },
-  "dependencies": {
+    "typescript": "^5.0.0",
     "rimraf": "^5.0.5"
   }
 }
