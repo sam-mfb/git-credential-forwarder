@@ -76,20 +76,27 @@ if (serverType === "tcp" && portEnv) {
     case "ipc":
       appOutput(`Starting IPC server listening on socket ${deps.socketPath}`)
       instructions(
-        `Bind mount this socket into your docker container and run the following command on your docker container (assuming you bind the socket at the same path):`
+        `Bind mount this socket into your docker container and run the following command on your docker container (assuming you bind the socket at the same path):\n`
       )
-      instructions(`\n    export ${EnvKey.SERVER}="${deps.socketPath}"\n`)
+      instructions(`    export ${EnvKey.SERVER}="${deps.socketPath}"\n`)
       break
     case "tcp":
       appOutput(`Starting TCP server listening on ${deps.host}:${deps.port}`)
-      instructions(`Run the following command in your docker container:`)
+      instructions(`Run the following command in your docker container:\n`)
       instructions(
-        `\n    export ${EnvKey.SERVER}="${
+        `    export ${EnvKey.SERVER}="${
           deps.host === LOCALHOST ? DOCKER_HOST_IP : deps.host
         }:${deps.port}"\n`
       )
       break
   }
+  instructions(
+    `Edit your git configuration file inside your docker container to call the git-credential-forwarder client script, for example:\n`
+  )
+  instructions(`   [credential]`)
+  instructions(
+    `     helper = "!f() { node ~/git-credential-forwarder/dist/client/index.js $*; }; f"`
+  )
 
   try {
     await credentialReceiver()
