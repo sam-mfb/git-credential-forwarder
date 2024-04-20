@@ -2,50 +2,63 @@ import { sanitize } from "../sanitize"
 
 describe(sanitize.name, () => {
   it("replaces password value with asterisks", () => {
-    const input = "user=admin\npassword=secret\nemail=admin@example.com"
-    const expected = "user=admin\npassword=********\nemail=admin@example.com"
+    const input = "password=secret"
+    const expected = "password=********"
     const result = sanitize(input)
     expect(result).toEqual(expected)
   })
 
-  it("replaces password value with asterisks", () => {
-    const input = "user=admin\rpassword=secure\rlocation=USA"
-    const expected = "user=admin\rpassword=********\rlocation=USA"
+  it("replaces password value with spaces around equal sign with asterisks", () => {
+    const input = "password = secret"
+    const expected = "password = ********"
     const result = sanitize(input)
     expect(result).toEqual(expected)
   })
 
-  it("returns input unchanged when no password is present", () => {
+  it("replaces quoted password value with asterisks", () => {
+    const input = 'password="verySecret"'
+    const expected = 'password="********"'
+    const result = sanitize(input)
+    expect(result).toEqual(expected)
+  })
+
+  it("replaces JSON format password value with asterisks", () => {
+    const input = '{"password": "jsonSecret"}'
+    const expected = '{"password": "********"}'
+    const result = sanitize(input)
+    expect(result).toEqual(expected)
+  })
+
+  it("replaces multiple password formats in mixed content with asterisks", () => {
+    const input =
+      'user=admin password = hidden password="visible" {"password":"json"}'
+    const expected =
+      'user=admin password = ******** password="********" {"password":"********"}'
+    const result = sanitize(input)
+    expect(result).toEqual(expected)
+  })
+
+  it("returns other key-value pairs unchanged", () => {
     const input = "username=admin\nlocation=USA"
     const expected = "username=admin\nlocation=USA"
     const result = sanitize(input)
     expect(result).toEqual(expected)
   })
 
-  it("replaces multiple password occurrences with asterisks", () => {
-    const input = "password=abc123\ninfo=data\npassword=xyz789\nend"
-    const expected = "password=********\ninfo=data\npassword=********\nend"
+  it("replaces multiple password fields with different formats with asterisks", () => {
+    const input =
+      'password=abc123\npassword = xyz789\npassword="hideThis"\n{"password":"andThis"}'
+    const expected =
+      'password=********\npassword = ********\npassword="********"\n{"password":"********"}'
     const result = sanitize(input)
     expect(result).toEqual(expected)
   })
 
-  it("ignores case in password field names", () => {
-    const input = "Password=visiblePass\nuser=user1"
-    const expected = "Password=********\nuser=user1"
-    const result = sanitize(input)
-    expect(result).toEqual(expected)
-  })
-
-  it("replaces password value with asterisks when password is at the start", () => {
-    const input = "password=initial\nuser=user1"
-    const expected = "password=********\nuser=user1"
-    const result = sanitize(input)
-    expect(result).toEqual(expected)
-  })
-
-  it("replaces password value with asterisks when password is at the end", () => {
-    const input = "user=user1\npassword=final"
-    const expected = "user=user1\npassword=********"
+  it("ignores case in password field names in different formats", () => {
+    const input =
+      'Password=visiblePass Password = "anotherOne" {"Password":"jsonPass"}'
+    const expected =
+      'Password=******** Password = "********" {"Password":"********"}'
     const result = sanitize(input)
     expect(result).toEqual(expected)
   })
@@ -57,9 +70,11 @@ describe(sanitize.name, () => {
     expect(result).toEqual(expected)
   })
 
-  it("replaces password value with asterisks in complex content", () => {
-    const input = "data=xyz\npassword=toHide\nmoreData\npassword=alsoHide"
-    const expected = "data=xyz\npassword=********\nmoreData\npassword=********"
+  it("replaces password values in complex content with asterisks", () => {
+    const input =
+      'data=xyz password=toHide moreData password="alsoHide" {"password":"inJson"}'
+    const expected =
+      'data=xyz password=******** moreData password="********" {"password":"********"}'
     const result = sanitize(input)
     expect(result).toEqual(expected)
   })

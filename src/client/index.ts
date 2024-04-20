@@ -6,6 +6,8 @@ import { buildCredentialForwarder } from "./buildCredentialForwarder"
 import { buildGitCredentialHelper } from "./buildGitCredentialHelper"
 import { parseServerInfo } from "./parseServerInfo"
 
+// NB: debugging needs to occur on stderr when the debuggers are setup
+// because git reads the output on stdout
 const DEBUG = process.env[EnvKey.DEBUG]
 
 const errorOutput = buildOutputWriter({ color: "red", stream: process.stderr })
@@ -32,7 +34,7 @@ switch (serverInfo.type) {
       type: "ipc",
       socketPath: serverInfo.socketPath,
       debugger: DEBUG
-        ? buildOutputWriter({ color: "cyan", stream: process.stdout })
+        ? buildOutputWriter({ color: "cyan", stream: process.stderr })
         : undefined
     })
     break
@@ -42,7 +44,7 @@ switch (serverInfo.type) {
       host: serverInfo.host,
       port: serverInfo.port,
       debugger: DEBUG
-        ? buildOutputWriter({ color: "cyan", stream: process.stdout })
+        ? buildOutputWriter({ color: "cyan", stream: process.stderr })
         : undefined
     })
     break
@@ -64,7 +66,7 @@ const gitCredentialHelper = buildGitCredentialHelper({
   },
   credentialOperationHandler: credentialForwarder,
   debugger: DEBUG
-    ? buildOutputWriter({ color: "green", stream: process.stdout })
+    ? buildOutputWriter({ color: "green", stream: process.stderr })
     : undefined
 })
 
