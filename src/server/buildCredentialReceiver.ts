@@ -66,9 +66,13 @@ export function buildCredentialReceiver(deps: Deps): () => Promise<void> {
               res.end(gitCredentialIoApi.serialize(output))
             },
             reason => {
-              debug(`Credential operation handler errored: "${reason}"`)
+              debug(
+                `Credential operation handler errored: "${JSON.stringify(
+                  reason
+                )}"`
+              )
               debug("Sending error header")
-              res.writeHead(500, reason)
+              res.writeHead(500, JSON.stringify(reason))
               debug("Ending response")
               res.end()
             }
