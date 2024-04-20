@@ -44,9 +44,13 @@ export function buildCredentialForwarder(
           debug(`Data chunk received: "${chunk}"`)
           outputRaw += chunk
         })
-        res.on("error", err => reject(err))
+        res.on("error", err => {
+          debug(`Response received error: "${err}"`)
+          reject(err)
+        })
         res.on("end", () => {
-          debug(`Response ended: "${outputRaw}"`)
+          debug(`Response ended with headers "${res.rawHeaders}"`)
+          debug(`Final output: "${outputRaw}"`)
           const outputDeserializedResult =
             gitCredentialIoApi.deserialize(outputRaw)
           if (Result.isSuccess(outputDeserializedResult)) {
