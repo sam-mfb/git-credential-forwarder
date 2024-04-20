@@ -33,10 +33,14 @@ export function buildCredentialReceiver(deps: Deps): () => Promise<void> {
     const server = http.createServer((req, res) => {
       const rawData: Buffer[] = []
 
+      req.on("close",()=>{debug("Request closed.")})
+      req.on("error",(err)=>{debug(`Request received error "${err}"`)})
+
       req.on("data", (chunk: Buffer) => {
         rawData.push(chunk)
       })
       req.on("end", () => {
+        debug("Request ended")
         const deserializedBody = JSON.parse(rawData.join(""))
         debug(`Received body: "${rawData.join("")}"`)
         if (!isCredentialRequestBody(deserializedBody)) {

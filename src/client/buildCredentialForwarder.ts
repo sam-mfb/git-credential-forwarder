@@ -55,6 +55,9 @@ export function buildCredentialForwarder(
             reject(outputDeserializedResult.error)
           }
         })
+        res.on("close", () => {
+          debug("Response closed")
+        })
       })
 
       req.on("error", reject)
@@ -65,6 +68,7 @@ export function buildCredentialForwarder(
       const serializedRequestBody = JSON.stringify(requestBody)
       debug(`Sending request body: "${serializedRequestBody}"`)
       req.write(serializedRequestBody)
+      debug("Ending request")
       req.end()
     })
   }
