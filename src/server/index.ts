@@ -1,45 +1,51 @@
-import { color } from "../color"
+import { EnvKey } from "../env"
+import { buildOutputWriter } from "../output"
 import { ServerType } from "../types"
 import { buildCredentialQuerier } from "./buildCredentialQuerier"
-import { Deps, buildCredentialReceiver } from "./buildCredentialReceiver"
+import { type Deps, buildCredentialReceiver } from "./buildCredentialReceiver"
 import { findAvailablePort } from "./findAvailablePort"
 
-const appOutput = (str: string): void => {
-  console.log(color(str, "cyan"))
-}
-const instructions = (str: string): void => {
-  console.log(color(str, "yellow"))
-}
-
+const DEBUG = process.env[EnvKey.DEBUG]
 const LOCALHOST = "127.0.0.1"
+const DOCKER_HOST_IP = "host.docker.internal"
+
+const appOutput = buildOutputWriter({ color: "cyan", stream: process.stdout })
+const instructions = buildOutputWriter({
+  color: "yellow",
+  stream: process.stdout
+})
+const errorOutput = buildOutputWriter({ color: "red", stream: process.stderr })
 
 let serverType: ServerType = "tcp"
-
 let socket = ""
-if (process.env.GIT_CREDENTIAL_FORWARDER_IPC) {
+let socketEnv = process.env[EnvKey.SOCKET]
+if (socketEnv) {
   serverType = "ipc"
-  socket = process.env.GIT_CREDENTIAL_FORWARDER_IPC
+  socket = socketEnv
 }
 
 let userSpecifiedPort: number | null = null
-if (serverType === "tcp" && process.env.GIT_CREDENTIAL_FORWARDER_PORT) {
-  const envPort = parseInt(process.env.GIT_CREDENTIAL_FORWARDER_PORT)
-  if (!isNaN(envPort)) {
-    userSpecifiedPort = envPort
+let portEnv = process.env[EnvKey.PORT]
+if (serverType === "tcp" && portEnv) {
+  const parsedPort = parseInt(portEnv)
+  if (!isNaN(parsedPort)) {
+    userSpecifiedPort = parsedPort
   }
 }
 
 ;(async () => {
   const credentialQuerier = buildCredentialQuerier({
     externalEnv: process.env,
-    debugger: str => process.stderr.write(color(str, "cyan") + "\n")
+    debugger: DEBUG
+      ? buildOutputWriter({ color: "magenta", stream: process.stdout })
+      : undefined
   })
 
   const baseDeps = {
     credentialOperationHandler: credentialQuerier,
-    debugger: (str: string): void => {
-      process.stderr.write(color(str, "green") + "\n")
-    }
+    debugger: DEBUG
+      ? buildOutputWriter({ color: "green", stream: process.stdout })
+      : undefined
   }
 
   let deps: Deps
@@ -72,16 +78,14 @@ if (serverType === "tcp" && process.env.GIT_CREDENTIAL_FORWARDER_PORT) {
       instructions(
         `Bind mount this socket into your docker container and run the following command on your docker container (assuming you bind the socket at the same path):`
       )
-      instructions(
-        `\n    export GIT_CREDENTIAL_FORWARDER_SERVER="${deps.socketPath}"\n`
-      )
+      instructions(`\n    export ${EnvKey.SERVER}="${deps.socketPath}"\n`)
       break
     case "tcp":
       appOutput(`Starting TCP server listening on ${deps.host}:${deps.port}`)
       instructions(`Run the following command in your docker container:`)
       instructions(
-        `\n    export GIT_CREDENTIAL_FORWARDER_SERVER="${
-          deps.host === LOCALHOST ? "host.docker.internal" : deps.host
+        `\n    export ${EnvKey.SERVER}="${
+          deps.host === LOCALHOST ? DOCKER_HOST_IP : deps.host
         }:${deps.port}"\n`
       )
       break
@@ -90,7 +94,7 @@ if (serverType === "tcp" && process.env.GIT_CREDENTIAL_FORWARDER_PORT) {
   try {
     await credentialReceiver()
   } catch (err) {
-    console.error(err)
+    errorOutput(JSON.stringify(err))
   }
 
   appOutput("Press ctrl+c to stop server.")

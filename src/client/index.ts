@@ -1,21 +1,24 @@
-import { color } from "../color"
+import { EnvKey } from "../env"
+import { buildOutputWriter } from "../output"
 import { Result } from "../result"
 import { CredentialOperationHandler } from "../types"
 import { buildCredentialForwarder } from "./buildCredentialForwarder"
 import { buildGitCredentialHelper } from "./buildGitCredentialHelper"
 import { parseServerInfo } from "./parseServerInfo"
 
-const serverInfoRaw = process.env.GIT_CREDENTIAL_FORWARDER_SERVER
+const DEBUG = process.env[EnvKey.DEBUG]
+
+const errorOutput = buildOutputWriter({ color: "red", stream: process.stderr })
+
+const serverInfoRaw = process.env[EnvKey.SERVER]
 if (!serverInfoRaw) {
-  console.error(
-    "The environmental variable GIT_CREDENTIAL_FORWARDER_SERVER was not defined"
-  )
+  errorOutput(`The environmental variable ${[EnvKey.SERVER]} was not defined`)
   process.exit(1)
 }
 
 const serverInfoResult = parseServerInfo(serverInfoRaw)
 if (Result.isFailure(serverInfoResult)) {
-  console.error(`Invalid server info: "${serverInfoResult.error.message}"`)
+  errorOutput(`Invalid server info: "${serverInfoResult.error.message}"`)
   process.exit(1)
 }
 
@@ -28,7 +31,9 @@ switch (serverInfo.type) {
     credentialForwarder = buildCredentialForwarder({
       type: "ipc",
       socketPath: serverInfo.socketPath,
-      debugger: str => process.stderr.write(color(str, "blue") + "\n")
+      debugger: DEBUG
+        ? buildOutputWriter({ color: "cyan", stream: process.stdout })
+        : undefined
     })
     break
   case "tcp":
@@ -36,7 +41,9 @@ switch (serverInfo.type) {
       type: "tcp",
       host: serverInfo.host,
       port: serverInfo.port,
-      debugger: str => process.stderr.write(color(str, "blue") + "\n")
+      debugger: DEBUG
+        ? buildOutputWriter({ color: "cyan", stream: process.stdout })
+        : undefined
     })
     break
 }
@@ -56,7 +63,9 @@ const gitCredentialHelper = buildGitCredentialHelper({
     }
   },
   credentialOperationHandler: credentialForwarder,
-  debugger: str => process.stderr.write(color(str, "green") + "\n")
+  debugger: DEBUG
+    ? buildOutputWriter({ color: "green", stream: process.stdout })
+    : undefined
 })
 
 gitCredentialHelper(process.argv)

@@ -9,8 +9,10 @@ const ansiColors = {
   white: "\x1b[37m"
 } as const
 
+export type AnsiColor = keyof typeof ansiColors
+
 const resetString = `\x1b[0m`
 
-export function color(str: string, color: keyof typeof ansiColors) {
+export function color(str: string, color: AnsiColor) {
   return `${ansiColors[color]}${str}${resetString}`
 }
