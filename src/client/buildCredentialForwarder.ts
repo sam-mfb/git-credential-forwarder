@@ -1,9 +1,4 @@
-import type {
-  CredentialOperationHandler,
-  CredentialRequestBody,
-  ServerType,
-  VsCodeCredentialRequestBody
-} from "../types"
+import type { CredentialOperationHandler, ServerType } from "../types"
 import type { GitCredentialInputOutput } from "../git-credential-types"
 
 import http from "http"
@@ -13,7 +8,6 @@ import { Result } from "../result"
 export function buildCredentialForwarder(
   deps: {
     type: ServerType
-    vsCodeCompatible: boolean
   } & (
     | {
         type: "ipc"
@@ -64,26 +58,9 @@ export function buildCredentialForwarder(
         operation,
         input
       }
-      const serializedRequestBody = JSON.stringify(
-        deps.vsCodeCompatible ? toVsCodeReqBody(requestBody) : requestBody
-      )
+      const serializedRequestBody = JSON.stringify(requestBody)
       req.write(serializedRequestBody)
       req.end()
     })
-  }
-}
-
-/*
- * Converts request body into the format that the VS Code Dev Container extension
- * expects. It appears to require a specific body format as well as a specific
- * prefix-type argument, presumably because its service does more than one thing
- */
-function toVsCodeReqBody(
-  body: CredentialRequestBody
-): VsCodeCredentialRequestBody {
-  const VS_CODE_GCH_PREFIX = "git-credential-helper"
-  return {
-    args: [VS_CODE_GCH_PREFIX, body.operation],
-    stdin: gitCredentialIoApi.serialize(body.input)
   }
 }

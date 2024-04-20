@@ -2,25 +2,7 @@ import {
   isGitCredentialHelperOperation,
   isGitCredentialInputOutput
 } from "./git-credential-types.guards"
-import type {
-  CredentialRequestBody,
-  VsCodeCredentialRequestBody
-} from "./types"
-
-export function isVsCodeCredentialRequestBody(
-  input: unknown
-): input is VsCodeCredentialRequestBody {
-  return (
-    typeof input === "object" &&
-    input !== null &&
-    "args" in input &&
-    Array.isArray(input.args) &&
-    input.args.length === 2 &&
-    input.args.every((item: unknown) => typeof item === "string") &&
-    "stdin" in input &&
-    typeof input.stdin === "string"
-  )
-}
+import type { CredentialRequestBody } from "./types"
 
 export function isCredentialRequestBody(
   input: unknown

@@ -15,16 +15,6 @@ export type CustomError = {
   message: string
 }
 
-/*
- * This is the body format (deserialized) that VS Code's Dev Container
- * extension expects, so it needs to be used for compatibility with
- * that service
- */
-export type VsCodeCredentialRequestBody = {
-  args: [string, string]
-  stdin: string
-}
-
 export type CredentialRequestBody = {
   operation: GitCredentialHelperOperation
   input: GitCredentialInputOutput

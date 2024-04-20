@@ -1,18 +1,8 @@
 import fs from "fs"
 import http from "http"
-import {
-  CredentialOperationHandler,
-  CredentialRequestBody,
-  ServerType,
-  VsCodeCredentialRequestBody
-} from "../types"
+import { CredentialOperationHandler, ServerType } from "../types"
 import { gitCredentialIoApi } from "../gitcredential-io"
-import { Result } from "../result"
-import {
-  isCredentialRequestBody,
-  isVsCodeCredentialRequestBody
-} from "../types.guard"
-import { isGitCredentialHelperOperation } from "../git-credential-types.guards"
+import { isCredentialRequestBody } from "../types.guard"
 import { promisify } from "util"
 
 const unlinkAsync = promisify(fs.unlink)
@@ -49,17 +39,10 @@ export function buildCredentialReceiver(deps: Deps): () => Promise<void> {
       req.on("end", () => {
         const deserializedBody = JSON.parse(rawData.join(""))
         debug(`Received body: "${rawData.join("")}"`)
-        let credentialRequestBody: CredentialRequestBody
-        if (isVsCodeCredentialRequestBody(deserializedBody)) {
-          credentialRequestBody = toCredReqBody(deserializedBody)
-        } else {
-          if (!isCredentialRequestBody(deserializedBody)) {
-            throw new Error(
-              `Body is not in expected format: ${deserializedBody}`
-            )
-          }
-          credentialRequestBody = deserializedBody
+        if (!isCredentialRequestBody(deserializedBody)) {
+          throw new Error(`Body is not in expected format: ${deserializedBody}`)
         }
+        const credentialRequestBody = deserializedBody
         deps
           .credentialOperationHandler(
             credentialRequestBody.operation,
@@ -96,24 +79,5 @@ export function buildCredentialReceiver(deps: Deps): () => Promise<void> {
       default:
         deps satisfies never
     }
-  }
-}
-
-function toCredReqBody(
-  body: VsCodeCredentialRequestBody
-): CredentialRequestBody {
-  const operation = body.args[1]
-  const inputResult = gitCredentialIoApi.deserialize(body.stdin)
-  if (
-    !isGitCredentialHelperOperation(operation) ||
-    Result.isFailure(inputResult)
-  ) {
-    throw new Error(
-      `Request body does not contain required information ${body.toString()}`
-    )
-  }
-  return {
-    operation,
-    input: inputResult.value
   }
 }

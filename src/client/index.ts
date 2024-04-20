@@ -26,16 +26,14 @@ switch (serverInfo.type) {
   case "ipc":
     credentialForwarder = buildCredentialForwarder({
       type: "ipc",
-      socketPath: serverInfo.socketPath,
-      vsCodeCompatible: true
+      socketPath: serverInfo.socketPath
     })
     break
   case "tcp":
     credentialForwarder = buildCredentialForwarder({
       type: "tcp",
       host: serverInfo.host,
-      port: serverInfo.port,
-      vsCodeCompatible: true
+      port: serverInfo.port
     })
     break
 }
