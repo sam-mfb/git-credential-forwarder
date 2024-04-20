@@ -26,14 +26,16 @@ switch (serverInfo.type) {
   case "ipc":
     credentialForwarder = buildCredentialForwarder({
       type: "ipc",
-      socketPath: serverInfo.socketPath
+      socketPath: serverInfo.socketPath,
+      debugger: str => process.stderr.write(str + "\n")
     })
     break
   case "tcp":
     credentialForwarder = buildCredentialForwarder({
       type: "tcp",
       host: serverInfo.host,
-      port: serverInfo.port
+      port: serverInfo.port,
+      debugger: str => process.stderr.write(str + "\n")
     })
     break
 }
