@@ -13,6 +13,10 @@ import { gitCredentialIoApi } from "../gitcredential-io"
 const execAsync = promisify(exec)
 
 export function buildCredentialQuerier(deps: {
+  // it needs the external env variables for certain external
+  // credential helpers, e.g., git-credential-manager, to work
+  // correctly
+  externalEnv: NodeJS.ProcessEnv
   debugger?: (str: string) => void
 }): CredentialOperationHandler {
   const debug = deps.debugger ? deps.debugger : () => {}
@@ -20,11 +24,26 @@ export function buildCredentialQuerier(deps: {
   return async (operation, input) => {
     switch (operation) {
       case gitCredentialHelperOperation.GET:
-        return runCredentialAction(gitCredentialAction.FILL, input, debug)
+        return runCredentialAction(
+          gitCredentialAction.FILL,
+          input,
+          deps.externalEnv,
+          debug
+        )
       case gitCredentialHelperOperation.STORE:
-        return runCredentialAction(gitCredentialAction.APPROVE, input, debug)
+        return runCredentialAction(
+          gitCredentialAction.APPROVE,
+          input,
+          deps.externalEnv,
+          debug
+        )
       case gitCredentialHelperOperation.ERASE:
-        return runCredentialAction(gitCredentialAction.REJECT, input, debug)
+        return runCredentialAction(
+          gitCredentialAction.REJECT,
+          input,
+          deps.externalEnv,
+          debug
+        )
       default:
         operation satisfies never
         return {}
@@ -35,9 +54,11 @@ export function buildCredentialQuerier(deps: {
 async function runCredentialAction(
   action: GitCredentialAction,
   input: GitCredentialInputOutput,
+  externalEnv: NodeJS.ProcessEnv,
   debug: (str: string) => void
 ): Promise<GitCredentialInputOutput> {
   const env = {
+    ...externalEnv,
     GIT_TERMINAL_PROMPT: "0"
   }
   const GIT_CMD = "git"
@@ -52,9 +73,14 @@ async function runCredentialAction(
       encoding: "utf8",
       env
     }
-  )
+  ).catch(err => {
+    debug(err)
+    throw err
+  })
 
-  debug(`Received stdout: "${stdout}"\nReceived stderr: "${stderr}"`)
+  if (stderr.length > 0) {
+    debug(`Received stderr: "${stderr}"`)
+  }
 
   const outputResult = gitCredentialIoApi.deserialize(stdout)
   if (Result.isSuccess(outputResult)) {

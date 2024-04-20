@@ -31,6 +31,7 @@ if (serverType === "tcp" && process.env.GIT_CREDENTIAL_FORWARDER_PORT) {
 
 ;(async () => {
   const credentialQuerier = buildCredentialQuerier({
+    externalEnv: process.env,
     debugger: str => process.stderr.write(color(str, "cyan") + "\n")
   })
 
