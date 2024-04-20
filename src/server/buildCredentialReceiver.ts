@@ -47,6 +47,7 @@ export function buildCredentialReceiver(deps: Deps): () => Promise<void> {
           throw new Error(`Body is not in expected format: ${deserializedBody}`)
         }
         const credentialRequestBody = deserializedBody
+        debug("Running credential operation handler...")
         deps
           .credentialOperationHandler(
             credentialRequestBody.operation,
@@ -54,12 +55,17 @@ export function buildCredentialReceiver(deps: Deps): () => Promise<void> {
           )
           .then(
             output => {
-              debug(`Received output: "${JSON.stringify(output)}"`)
+              debug("Credential operation handler completed")
+              debug("Sending success header")
               res.writeHead(200)
+              debug(`Ending response with output: "${JSON.stringify(output)}"`)
               res.end(gitCredentialIoApi.serialize(output))
             },
-            () => {
+            (reason) => {
+              debug(`Credential operation handler errored: "${reason}"`)
+              debug("Sending error header")
               res.writeHead(500)
+              debug("Ending response")
               res.end()
             }
           )
