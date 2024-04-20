@@ -49,16 +49,20 @@ if (process.env.GCH_FWD_IPC) {
   switch (deps.type) {
     case "ipc":
       console.log(`Starting IPC server listening on socket ${deps.socketPath}`)
-      console.log(`Run the following command on your client environment:`)
+      console.log(
+        `Bind mount this socket into your docker container and run the following command on your docker container (assuming you bind the socket at the same path):`
+      )
       console.log(
         `\n    export GIT_CREDENTIAL_FORWARDER_SERVER="${deps.socketPath}"\n`
       )
       break
     case "tcp":
       console.log(`Starting TCP server listening on ${deps.host}:${deps.port}`)
-      console.log(`Run the following command on your client environment:`)
+      console.log(`Run the following command in your docker container:`)
       console.log(
-        `\n    export GIT_CREDENTIAL_FORWARDER_SERVER="${deps.host}:${deps.port}"\n`
+        `\n    export GIT_CREDENTIAL_FORWARDER_SERVER="${
+          deps.host === LOCALHOST ? "host.docker.internal" : deps.host
+        }:${deps.port}"\n`
       )
       break
   }
