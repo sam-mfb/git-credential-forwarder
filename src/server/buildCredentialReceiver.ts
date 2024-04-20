@@ -33,8 +33,12 @@ export function buildCredentialReceiver(deps: Deps): () => Promise<void> {
     const server = http.createServer((req, res) => {
       const rawData: Buffer[] = []
 
-      req.on("close",()=>{debug("Request closed.")})
-      req.on("error",(err)=>{debug(`Request received error "${err}"`)})
+      req.on("close", () => {
+        debug("Request closed.")
+      })
+      req.on("error", err => {
+        debug(`Request received error "${err}"`)
+      })
 
       req.on("data", (chunk: Buffer) => {
         rawData.push(chunk)
@@ -61,10 +65,10 @@ export function buildCredentialReceiver(deps: Deps): () => Promise<void> {
               debug(`Ending response with output: "${JSON.stringify(output)}"`)
               res.end(gitCredentialIoApi.serialize(output))
             },
-            (reason) => {
+            reason => {
               debug(`Credential operation handler errored: "${reason}"`)
               debug("Sending error header")
-              res.writeHead(500)
+              res.writeHead(500, reason)
               debug("Ending response")
               res.end()
             }

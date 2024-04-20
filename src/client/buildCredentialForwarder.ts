@@ -49,7 +49,19 @@ export function buildCredentialForwarder(
           reject(err)
         })
         res.on("end", () => {
-          debug(`Response ended with headers "${res.rawHeaders}"`)
+          const { statusCode, statusMessage } = res
+          debug(
+            `Status: ${statusCode ?? "No Code"}-${
+              statusMessage ?? "No message"
+            }`
+          )
+          if (statusCode !== 200) {
+            reject(
+              `Http request failed: Status: ${statusCode ?? "No Code"}-${
+                statusMessage ?? "No message"
+              }`
+            )
+          }
           debug(`Final output: "${outputRaw}"`)
           const outputDeserializedResult =
             gitCredentialIoApi.deserialize(outputRaw)

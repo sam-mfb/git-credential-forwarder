@@ -3,6 +3,7 @@ import { extractOperation } from "./extractOperation"
 import type { CredentialOperationHandler } from "../types"
 import type { GitCredentialHelperOperation } from "../git-credential-types"
 import { gitCredentialIoApi } from "../gitcredential-io"
+import { color } from "../color"
 
 export function buildGitCredentialHelper(deps: {
   streams: {
@@ -112,7 +113,7 @@ function runCredentialOperationHandler(args: {
     })
     .catch(err => {
       debug(`Credential handler error "${err}"`)
-      args.streams.error.write(JSON.stringify(err))
+      args.streams.error.write(color("\n" + JSON.stringify(err) + "\n", "red"))
       debug(`Exiting on failure...`)
       args.onExit.failure()
     })

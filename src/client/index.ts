@@ -1,3 +1,4 @@
+import { color } from "../color"
 import { Result } from "../result"
 import { CredentialOperationHandler } from "../types"
 import { buildCredentialForwarder } from "./buildCredentialForwarder"
@@ -27,7 +28,7 @@ switch (serverInfo.type) {
     credentialForwarder = buildCredentialForwarder({
       type: "ipc",
       socketPath: serverInfo.socketPath,
-      debugger: str => process.stderr.write(str + "\n")
+      debugger: str => process.stderr.write(color(str, "blue") + "\n")
     })
     break
   case "tcp":
@@ -35,7 +36,7 @@ switch (serverInfo.type) {
       type: "tcp",
       host: serverInfo.host,
       port: serverInfo.port,
-      debugger: str => process.stderr.write(str + "\n")
+      debugger: str => process.stderr.write(color(str, "blue") + "\n")
     })
     break
 }
@@ -55,7 +56,7 @@ const gitCredentialHelper = buildGitCredentialHelper({
     }
   },
   credentialOperationHandler: credentialForwarder,
-  debugger: str => process.stderr.write(str + "\n")
+  debugger: str => process.stderr.write(color(str, "green") + "\n")
 })
 
 gitCredentialHelper(process.argv)

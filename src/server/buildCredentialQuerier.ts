@@ -6,7 +6,7 @@ import {
   gitCredentialHelperOperation
 } from "../git-credential-types"
 import { Result } from "../result"
-import { CredentialOperationHandler, CustomError } from "../types"
+import { CredentialOperationHandler } from "../types"
 import { exec } from "child_process"
 import { gitCredentialIoApi } from "../gitcredential-io"
 
@@ -44,7 +44,7 @@ async function runCredentialAction(
   const GIT_CREDENTIAL_ARG = "credential"
   const inputSerialized = gitCredentialIoApi.serialize(input)
   debug(
-    `echo '${inputSerialized}' | ${GIT_CMD} ${GIT_CREDENTIAL_ARG} ${action}`,
+    `Running shell command: "echo '${inputSerialized}' | ${GIT_CMD} ${GIT_CREDENTIAL_ARG} ${action}"`
   )
   const { stdout, stderr } = await execAsync(
     `echo '${inputSerialized}' | ${GIT_CMD} ${GIT_CREDENTIAL_ARG} ${action}`,
