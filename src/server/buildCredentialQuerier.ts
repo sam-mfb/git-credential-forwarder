@@ -42,8 +42,12 @@ async function runCredentialAction(
   }
   const GIT_CMD = "git"
   const GIT_CREDENTIAL_ARG = "credential"
+  const inputSerialized = gitCredentialIoApi.serialize(input)
+  debug(
+    `echo '${inputSerialized}' | ${GIT_CMD} ${GIT_CREDENTIAL_ARG} ${action}`,
+  )
   const { stdout, stderr } = await execAsync(
-    `echo '${input}' | ${GIT_CMD} ${GIT_CREDENTIAL_ARG} ${action}`,
+    `echo '${inputSerialized}' | ${GIT_CMD} ${GIT_CREDENTIAL_ARG} ${action}`,
     {
       encoding: "utf8",
       env

@@ -8,6 +8,7 @@ import { Result } from "../result"
 export function buildCredentialForwarder(
   deps: {
     type: ServerType
+    debugger?: (str: string) => void
   } & (
     | {
         type: "ipc"
@@ -20,6 +21,7 @@ export function buildCredentialForwarder(
       }
   )
 ): CredentialOperationHandler {
+  const debug = deps.debugger ? deps.debugger : () => {}
   return (operation, input) => {
     return new Promise<GitCredentialInputOutput>((resolve, reject) => {
       const requestOptions: http.RequestOptions = {
@@ -39,10 +41,12 @@ export function buildCredentialForwarder(
         let outputRaw: string = ""
         res.setEncoding("utf8")
         res.on("data", (chunk: string) => {
+          debug(`Data chunk received: "${chunk}"`)
           outputRaw += chunk
         })
-        res.on("error", reject)
+        res.on("error", err => reject(err))
         res.on("end", () => {
+          debug(`Response ended: "${outputRaw}"`)
           const outputDeserializedResult =
             gitCredentialIoApi.deserialize(outputRaw)
           if (Result.isSuccess(outputDeserializedResult)) {
@@ -59,6 +63,7 @@ export function buildCredentialForwarder(
         input
       }
       const serializedRequestBody = JSON.stringify(requestBody)
+      debug(`Sending request body: "${serializedRequestBody}"`)
       req.write(serializedRequestBody)
       req.end()
     })
