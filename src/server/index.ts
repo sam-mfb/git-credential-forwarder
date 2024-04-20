@@ -46,10 +46,28 @@ if (process.env.GCH_FWD_IPC) {
       break
   }
   const credentialReceiver = buildCredentialReceiver(deps)
+  switch (deps.type) {
+    case "ipc":
+      console.log(`Starting IPC server listening on socket ${deps.socketPath}`)
+      console.log(`Run the following command on your client environment:`)
+      console.log(
+        `\n    export GIT_CREDENTIAL_FORWARDER_SERVER="${deps.socketPath}"\n`
+      )
+      break
+    case "tcp":
+      console.log(`Starting TCP server listening on ${deps.host}:${deps.port}`)
+      console.log(`Run the following command on your client environment:`)
+      console.log(
+        `\n    export GIT_CREDENTIAL_FORWARDER_SERVER="${deps.host}:${deps.port}"\n`
+      )
+      break
+  }
 
   try {
     await credentialReceiver()
   } catch (err) {
     console.error(err)
   }
+
+  console.log("Press ctrl+c to stop server.")
 })()

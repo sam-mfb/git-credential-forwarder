@@ -1,12 +1,44 @@
+import { Result } from "../result"
+import { CredentialOperationHandler } from "../types"
 import { buildCredentialForwarder } from "./buildCredentialForwarder"
 import { buildGitCredentialHelper } from "./buildGitCredentialHelper"
+import { parseServerInfo } from "./parseServerInfo"
 
-const result = parseServerInfo(process.env.GIT_CREDENTIAL_FORWARDER_SERVER)
+const serverInfoRaw = process.env.GIT_CREDENTIAL_FORWARDER_SERVER
+if (!serverInfoRaw) {
+  console.error(
+    "The environmental variable GIT_CREDENTIAL_FORWARDER_SERVER was not defined"
+  )
+  process.exit(1)
+}
 
-const credentialForwarder = buildCredentialForwarder({
-  socketPath: SOCK_PATH,
-  vsCodeCompatible: true
-})
+const serverInfoResult = parseServerInfo(serverInfoRaw)
+if (Result.isFailure(serverInfoResult)) {
+  console.error(`Invalid server info: "${serverInfoResult.error.message}"`)
+  process.exit(1)
+}
+
+const serverInfo = serverInfoResult.value
+
+let credentialForwarder: CredentialOperationHandler
+
+switch (serverInfo.type) {
+  case "ipc":
+    credentialForwarder = buildCredentialForwarder({
+      type: "ipc",
+      socketPath: serverInfo.socketPath,
+      vsCodeCompatible: true
+    })
+    break
+  case "tcp":
+    credentialForwarder = buildCredentialForwarder({
+      type: "tcp",
+      host: serverInfo.host,
+      port: serverInfo.port,
+      vsCodeCompatible: true
+    })
+    break
+}
 
 const gitCredentialHelper = buildGitCredentialHelper({
   streams: {

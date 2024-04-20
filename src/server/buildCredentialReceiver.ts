@@ -88,11 +88,9 @@ export function buildCredentialReceiver(deps: Deps): () => Promise<void> {
             throw new Error(`Error removing old socket: ${error}`)
           }
         }
-        debug(`Starting IPC server listening on socket ${deps.socketPath}`)
         server.listen(deps.socketPath)
         break
       case "tcp":
-        debug(`Starting TCP server listening on ${deps.host}:${deps.port}`)
         server.listen(deps.port, deps.host)
         break
       default:

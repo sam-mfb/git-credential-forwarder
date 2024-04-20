@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "rimraf ./dist && tsc -p tsconfig.prod.json",
-    "start": "node bin/index.js"
+    "start": "node bin/index.js",
+    "test": "jest --watch"
   },
   "author": "Sam Davidoff",
   "license": "MIT",
