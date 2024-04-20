@@ -4,6 +4,13 @@ import { buildCredentialQuerier } from "./buildCredentialQuerier"
 import { Deps, buildCredentialReceiver } from "./buildCredentialReceiver"
 import { findAvailablePort } from "./findAvailablePort"
 
+const appOutput = (str: string): void => {
+  console.log(color(str, "cyan"))
+}
+const instructions = (str: string): void => {
+  console.log(color(str, "yellow"))
+}
+
 const LOCALHOST = "127.0.0.1"
 
 let serverType: ServerType = "tcp"
@@ -12,6 +19,14 @@ let socket = ""
 if (process.env.GIT_CREDENTIAL_FORWARDER_IPC) {
   serverType = "ipc"
   socket = process.env.GIT_CREDENTIAL_FORWARDER_IPC
+}
+
+let userSpecifiedPort: number | null = null
+if (serverType === "tcp" && process.env.GIT_CREDENTIAL_FORWARDER_PORT) {
+  const envPort = parseInt(process.env.GIT_CREDENTIAL_FORWARDER_PORT)
+  if (!isNaN(envPort)) {
+    userSpecifiedPort = envPort
+  }
 }
 
 ;(async () => {
@@ -37,7 +52,10 @@ if (process.env.GIT_CREDENTIAL_FORWARDER_IPC) {
       }
       break
     case "tcp":
-      const port = await findAvailablePort(LOCALHOST)
+      if (userSpecifiedPort) {
+        appOutput(`Attempting to use user specified port ${userSpecifiedPort}`)
+      }
+      const port = userSpecifiedPort ?? (await findAvailablePort(LOCALHOST))
       deps = {
         ...baseDeps,
         type: "tcp",
@@ -49,42 +67,21 @@ if (process.env.GIT_CREDENTIAL_FORWARDER_IPC) {
   const credentialReceiver = buildCredentialReceiver(deps)
   switch (deps.type) {
     case "ipc":
-      console.log(
-        color(
-          `Starting IPC server listening on socket ${deps.socketPath}`,
-          "blue"
-        )
+      appOutput(`Starting IPC server listening on socket ${deps.socketPath}`)
+      instructions(
+        `Bind mount this socket into your docker container and run the following command on your docker container (assuming you bind the socket at the same path):`
       )
-      console.log(
-        color(
-          `Bind mount this socket into your docker container and run the following command on your docker container (assuming you bind the socket at the same path):`,
-          "yellow"
-        )
-      )
-      console.log(
-        color(
-          `\n    export GIT_CREDENTIAL_FORWARDER_SERVER="${deps.socketPath}"\n`,
-          "yellow"
-        )
+      instructions(
+        `\n    export GIT_CREDENTIAL_FORWARDER_SERVER="${deps.socketPath}"\n`
       )
       break
     case "tcp":
-      console.log(
-        color(
-          `Starting TCP server listening on ${deps.host}:${deps.port}`,
-          "blue"
-        )
-      )
-      console.log(
-        color(`Run the following command in your docker container:`, "yellow")
-      )
-      console.log(
-        color(
-          `\n    export GIT_CREDENTIAL_FORWARDER_SERVER="${
-            deps.host === LOCALHOST ? "host.docker.internal" : deps.host
-          }:${deps.port}"\n`,
-          "yellow"
-        )
+      appOutput(`Starting TCP server listening on ${deps.host}:${deps.port}`)
+      instructions(`Run the following command in your docker container:`)
+      instructions(
+        `\n    export GIT_CREDENTIAL_FORWARDER_SERVER="${
+          deps.host === LOCALHOST ? "host.docker.internal" : deps.host
+        }:${deps.port}"\n`
       )
       break
   }
@@ -95,5 +92,5 @@ if (process.env.GIT_CREDENTIAL_FORWARDER_IPC) {
     console.error(err)
   }
 
-  console.log(color("Press ctrl+c to stop server.", "blue"))
+  appOutput("Press ctrl+c to stop server.")
 })()
