@@ -41,6 +41,28 @@ Notes:
 
 - You can turn on more verbose debugging information by setting the environmental variable `GIT_CREDENTIAL_FORWARDER_DEBUG` to `true`
 
+### Using a Dockerfile
+
+Here's a strategy to make this fairly easy to use with a Docker container built with a Dockerfile.
+
+On the host, set a specific port that you will listen on by configuring the env variable `GIT_CREDENTIAL_FORWARDER_PORT`.
+
+Add these lines in the Dockerfile
+
+```
+RUN curl -LO https://github.com/sam-mfb/git-credential-forwarder/releases/download/v[VERSION]/git-credential-forwarder.zip
+RUN unzip git-credential-forwarder.zip
+RUN git config --global credential.helper '!f(){ node ~/gcf-client.js $*; }; f'
+ENV GIT_CREDENTIAL_FORWARDER_SERVER host.docker.internal:[PORT]
+```
+Of course, replace `[VERSION]` and `[PORT]` with the actual version number and port number (or use Docker's `ARG` command).
+
+Note that you may need to add some other things to your git configuration. For example, to work with Azure DevOps OAuth2 authentication add:
+
+```
+RUN git config --global credential.https://dev.azure.com.useHttpPath true
+```
+
 ## Using a File Socket
 
 By default the server uses a tcp server listening on `localhost`. You can tell it to use a file socket instead of tcp by setting the environmental variable `GIT_CREDENTIAL_FORWARDER_SOCKET` to the location you want the socket created. You must have permission to create a socket at that location.
