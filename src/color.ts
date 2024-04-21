@@ -13,6 +13,6 @@ export type AnsiColor = keyof typeof ansiColors
 
 const resetString = `\x1b[0m`
 
-export function color(str: string, color: AnsiColor) {
+export function color(str: string, color: AnsiColor): string {
   return `${ansiColors[color]}${str}${resetString}`
 }

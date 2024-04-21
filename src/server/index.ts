@@ -18,14 +18,14 @@ const errorOutput = buildOutputWriter({ color: "red", stream: process.stderr })
 
 let serverType: ServerType = "tcp"
 let socket = ""
-let socketEnv = process.env[EnvKey.SOCKET]
+const socketEnv = process.env[EnvKey.SOCKET]
 if (socketEnv) {
   serverType = "ipc"
   socket = socketEnv
 }
 
 let userSpecifiedPort: number | null = null
-let portEnv = process.env[EnvKey.PORT]
+const portEnv = process.env[EnvKey.PORT]
 if (serverType === "tcp" && portEnv) {
   const parsedPort = parseInt(portEnv)
   if (!isNaN(parsedPort)) {
@@ -105,4 +105,4 @@ if (serverType === "tcp" && portEnv) {
   }
 
   appOutput("Press ctrl+c to stop server.")
-})()
+})().catch(err => errorOutput(JSON.stringify(err)))

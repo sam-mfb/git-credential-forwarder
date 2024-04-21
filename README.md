@@ -10,13 +10,13 @@ Because this helper is designed to allow sharing credentials on the same machine
 
 ## Installation and Usage
 
-This helper is written in Typescript and compiles down to two Javascript scripts, one for the server and one for the client. At this point, there is no installation tooling or bundling.  The simplest way to install it is to clone this repo on both the host machine and inside the Docker container. Once that is done, do the following:
+This helper is written in Typescript and compiles down to two Javascript scripts, one for the server and one for the client. At this point, there is no installation tooling. The simplest way to install it is to clone this repo on both the host machine and inside the Docker container. Once that is done, do the following:
 
 ### On the host
 
 Run `pnpm install & pnpm build` or your favorite package tool to install dependencies and compile the app.
 
-At the root of the repository, run `node dist/server/index.js`. This will launch the server and it will listen for TCP connections on localhost at a random port which will be displayed in the console. You will need to keep this console/terminal open.
+At the root of the repository, run `node dist/gcf-server.js`. This will launch the server and it will listen for TCP connections on localhost at a random port which will be displayed in the console. You will need to keep this console/terminal open.
 
 Notes:
 
@@ -32,7 +32,7 @@ Edit your git configuration file to call the client you just complied as a git c
 
 ```
 [credential]
-  helper = "!f() { node ~/git-credential-forwarder/dist/client/index.js $*; }; f"
+  helper = "!f() { node ~/git-credential-forwarder/dist/gcf-client.js $*; }; f"
 ```
 
 Run git normally and all requests for credentials should be passed through to the host which will handle appropriately on the host side.
@@ -69,6 +69,6 @@ Nothing is perfectly secure, but I have tried to think through the security impl
 ## To Do
 
 - Test more extensively. Mostly it's only be tested on Azure Devops and GitHub using git credential manager as the host credential helper.
-- Bundle the scripts and make the install easier.
+- Make the install easier.
 - More tests.
 - Maybe some utilities to make setting up the docker part easier to do as part of a Dockerfile

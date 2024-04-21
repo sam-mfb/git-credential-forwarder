@@ -1,21 +1,32 @@
 {
   "name": "git-credential-forwarder",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "utilities for forwarding git credential helper commands to another git installation (e.g. container to host)",
   "main": "dist/index.js",
   "scripts": {
-    "build": "rimraf ./dist && tsc -p tsconfig.prod.json",
+    "build": "rimraf ./dist && webpack",
     "start": "node bin/index.js",
-    "test": "jest --watch"
+    "test": "jest --watch",
+    "lint": "eslint ./src/",
+    "fix-formatting": "prettier --write --config ./prettier.config.js ./src/",
+    "check-formatting": "prettier --check --config ./prettier.config.js ./src/"
   },
   "author": "Sam Davidoff",
   "license": "MIT",
   "devDependencies": {
+    "@rushstack/eslint-config": "^3.6.9",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.12.4",
+    "@typescript-eslint/eslint-plugin": "^7.7.0",
+    "@typescript-eslint/parser": "^7.7.0",
+    "eslint": "^8.57.0",
     "jest": "^29.7.0",
+    "prettier": "^3.2.5",
     "rimraf": "^5.0.5",
     "ts-jest": "^29.1.2",
-    "typescript": "^5.0.0"
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.0.0",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4"
   }
 }
