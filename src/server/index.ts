@@ -14,6 +14,10 @@ const instructions = buildOutputWriter({
   color: "yellow",
   stream: process.stdout
 })
+const configOutput = buildOutputWriter({
+  color: "white",
+  stream: process.stdout
+})
 const errorOutput = buildOutputWriter({ color: "red", stream: process.stderr })
 
 let serverType: ServerType = "tcp"
@@ -93,10 +97,8 @@ if (serverType === "tcp" && portEnv) {
   instructions(
     `Edit your git configuration file inside your docker container to call the git-credential-forwarder client script, for example:\n`
   )
-  instructions(`   [credential]`)
-  instructions(
-    `     helper = "!f() { node ~/git-credential-forwarder/dist/client/index.js $*; }; f"`
-  )
+  configOutput(`   [credential]`)
+  configOutput(`     helper = "!f() { node ~/gcf-client.js $*; }; f"`)
 
   try {
     await credentialReceiver()
@@ -104,5 +106,5 @@ if (serverType === "tcp" && portEnv) {
     errorOutput(JSON.stringify(err))
   }
 
-  appOutput("Press ctrl+c to stop server.")
+  appOutput("Ctrl+c to stop server.")
 })().catch(err => errorOutput(JSON.stringify(err)))
