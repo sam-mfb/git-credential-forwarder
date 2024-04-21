@@ -87,7 +87,7 @@ if (serverType === "tcp" && portEnv) {
     case "tcp":
       appOutput(`Starting TCP server listening on ${deps.host}:${deps.port}`)
       instructions(`Run the following command in your docker container:\n`)
-      instructions(
+      configOutput(
         `    export ${EnvKey.SERVER}="${
           deps.host === LOCALHOST ? DOCKER_HOST_IP : deps.host
         }:${deps.port}"\n`
@@ -98,7 +98,7 @@ if (serverType === "tcp" && portEnv) {
     `Edit your git configuration file inside your docker container to call the git-credential-forwarder client script, for example:\n`
   )
   configOutput(`   [credential]`)
-  configOutput(`     helper = "!f() { node ~/gcf-client.js $*; }; f"`)
+  configOutput(`     helper = "!f() { node ~/gcf-client.js $*; }; f"\n`)
 
   try {
     await credentialReceiver()
