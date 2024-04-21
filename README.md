@@ -1,22 +1,24 @@
 # git-credential-forwarder
 
-A helper that allows forwarding git credential requests from one git instance (the "client") to another (the "server"). The purpose is to allow the client to use the git credentials or credential helper present on the host.
+A helper that allows forwarding git credential requests from one git instance (the "client") to another (the "server"). The purpose is to allow the client to use the git credentials or credential helper present on the server.
 
-This was created for the specific use case of being able to run git inside a docker container while using the credential helper configured on the docker host. This, for example, allows development inside a linux-based docker development container while relying on credentials being managed by [git-credential-manager](https://github.com/git-ecosystem/git-credential-manager) on the host. This helper is particularly useful in that scenario because the tools for using git-credential-manager inside a CLI-only linux container have [some](https://github.com/git-ecosystem/git-credential-manager/blob/release/docs/credstores.md) [limitations](https://github.com/git-ecosystem/git-credential-manager/issues/1549), particularly when used with [MSAL oauth2](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/issues/3033).
+This was created for the specific use case of being able to run git inside a Docker container while using the credential helper configured on the Docker host. This, for example, allows development inside a linux-based Docker development container while relying on credentials being managed by [git-credential-manager](https://github.com/git-ecosystem/git-credential-manager) on the host. This helper is particularly useful in that scenario because the tools for using git-credential-manager inside a CLI-only linux container have [some](https://github.com/git-ecosystem/git-credential-manager/blob/release/docs/credstores.md) [limitations](https://github.com/git-ecosystem/git-credential-manager/issues/1549), particularly when used with [MSAL oauth2](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/issues/3033).
 
-Similar functionality is provided by VS Code's [Remote Containers extension](https://code.visualstudio.com/remote/advancedcontainers/sharing-git-credentials#_using-a-credential-helper), however using that requires using VS Code and allowing that extension to manage the containers. This helper allows this type of functionality with any Docker containers.
+Similar functionality is provided by VS Code's [Remote Containers extension](https://code.visualstudio.com/remote/advancedcontainers/sharing-git-credentials#_using-a-credential-helper), however using that requires using VS Code and allowing that extension to manage the containers. This helper allows this type of functionality with a vanilla Docker container.
 
-Because this helper is designed to allow sharing credentials on the same machine, it is setup to share credentials either over a file socket or a tcp connection on `localhost` using http. There is nothing in principle that would prevent listening for tcp connections from arbitrary locations on the network, and it would be trivial to edit this code to do that. But unless you take additional protections, this is a _bad idea_. The server's connections are not encrypted and not protected by any authentication. Accordingly if it's socket is exposed on your network, it will accept any request for credentials and respond with the credentials in plaintext. See the [Security](#security) section for more information.
+Because this helper is designed to allow sharing credentials on the same machine, it is setup to share credentials either over a file socket or a tcp connection on `localhost` using http. There is nothing in principle that would prevent listening for tcp connections from arbitrary locations on the network, and it would be trivial to edit this code to do that. But unless you take additional protections, this is a _bad idea_. The server's connections are not encrypted and not protected by any authentication. Accordingly if its socket is exposed on your network, it will accept any request for credentials and respond with the credentials in plaintext. See the [Security](#security) section for more information.
 
 ## Installation and Usage
 
-This helper is written in Typescript and compiles down to two Javascript scripts, one for the server and one for the client. At this point, there is no installation tooling. The simplest way to install it is to clone this repo on both the host machine and inside the Docker container. Once that is done, do the following:
+This helper is written in Typescript and compiles down to two Javascript scripts, one for the server and one for the client.
+
+### Download
+
+Download the latest release from this repo. The release consists of a filed named `git-credential-forwarder.zip` which contains two Javascript scripts: `gcf-server.js` and `gcf-client.js`. These can be placed wherever you want, but these instructions assume they are placed in the home directories of the host and container.
 
 ### On the host
 
-Run `pnpm install & pnpm build` or your favorite package tool to install dependencies and compile the app.
-
-At the root of the repository, run `node dist/gcf-server.js`. This will launch the server and it will listen for TCP connections on localhost at a random port which will be displayed in the console. You will need to keep this console/terminal open.
+Run `node ~/gcf-server.js`. This will launch the server and it will listen for TCP connections on localhost at a random port which will be displayed in the console. You will need to keep this console/terminal open.
 
 Notes:
 
@@ -24,15 +26,13 @@ Notes:
 
 ### In the container
 
-Run `pnpm install & pnpm build` or your favorite package tool to install dependencies and compile the app.
-
-Run `export GIT_CREDENTIAL_FORWARDER_SERVER="host.docker.internal:PORT` where PORT is replaced with the port displayed when you ran the server.
+Run `export GIT_CREDENTIAL_FORWARDER_SERVER="host.Docker.internal:PORT` where PORT is replaced with the port displayed when you ran the server.
 
 Edit your git configuration file to call the client you just complied as a git credential helper, as follows:
 
 ```
 [credential]
-  helper = "!f() { node ~/git-credential-forwarder/dist/gcf-client.js $*; }; f"
+  helper = "!f() { node ~/gcf-client.js $*; }; f"
 ```
 
 Run git normally and all requests for credentials should be passed through to the host which will handle appropriately on the host side.
@@ -47,7 +47,7 @@ By default the server uses a tcp server listening on `localhost`. You can tell i
 
 On the client/container side, you need to bind mount the socket into your container and then run `export GIT_CREDENTIAL_FORWARDER_SERVER="/path/to/socket"`.
 
-Note that this will not work from a Mac OS host per [this docker issue](https://github.com/docker/for-mac/issues/483), which is a signficant limitation.
+Note that this will not work from a Mac OS host per [this Docker issue](https://github.com/Docker/for-mac/issues/483), which is a signficant limitation.
 
 ## Debugging
 
@@ -71,4 +71,4 @@ Nothing is perfectly secure, but I have tried to think through the security impl
 - Test more extensively. Mostly it's only be tested on Azure Devops and GitHub using git credential manager as the host credential helper.
 - Make the install easier.
 - More tests.
-- Maybe some utilities to make setting up the docker part easier to do as part of a Dockerfile
+- Maybe some utilities to make setting up the Docker part easier to do as part of a Dockerfile
