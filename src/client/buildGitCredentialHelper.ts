@@ -30,9 +30,12 @@ export function buildGitCredentialHelper(deps: {
       switch (operationResult.error.errorType) {
         case "generic":
           debug(operationResult.error.message)
-          throw new Error(operationResult.error.message)
+          deps.streams.error.write(operationResult.error.message)
+          deps.onExit.failure()
+          return
         case "silent":
           debug(operationResult.error.message)
+          deps.onExit.success()
           return
         default:
           operationResult.error.errorType satisfies never

@@ -104,7 +104,11 @@ if (serverType === "tcp" && portEnv) {
     await credentialReceiver()
   } catch (err) {
     errorOutput(JSON.stringify(err))
+    process.exit(1)
   }
 
   appOutput("Ctrl+c to stop server.")
-})().catch(err => errorOutput(JSON.stringify(err)))
+})().catch(err => {
+  errorOutput(JSON.stringify(err))
+  process.exit(1)
+})
