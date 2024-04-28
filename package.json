@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "rimraf ./dist && webpack",
+    "build-mock-git": "rimraf ./src/__tests__/dist && tsc -p ./tsconfig.mock-git.json",
     "start": "node bin/index.js",
     "test": "jest --watch",
     "lint": "eslint ./src/",

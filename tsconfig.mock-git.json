@@ -1,0 +1,10 @@
+{
+"extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": false,
+    "outDir": "src/__tests__/dist",
+    "types": ["node"]
+  },
+  "include": ["src/__tests__/mock_git.ts"]
+}
