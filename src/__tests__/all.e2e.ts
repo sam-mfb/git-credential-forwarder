@@ -1,5 +1,6 @@
 import { StdioOptions, execSync, spawn } from "child_process"
 import { EnvKey } from "../env"
+import { GitCredentialHelperOperation } from "../git-credential-types"
 
 let serverProcess: ReturnType<typeof spawn>
 
@@ -23,30 +24,46 @@ afterAll(() => {
   serverProcess.kill()
 })
 
-it("On client 'get' command, host output is received", async () => {
-  await runClient("username=sam", output => {
-    expect(output).toEqual("username=sam\npassword=myMockSecretPassword")
+it("Returns output of host on a valid git credential operation", async () => {
+  return runClient("get", "username=myUser", output => {
+    expect(output).toEqual("username=myUser\npassword=myMockSecretPassword")
   })
 })
 
+it("Returns no output on unsupported git command", async () => {
+  return runClient(
+    "move" as GitCredentialHelperOperation,
+    "username=myUser",
+    output => {
+      expect(output).toEqual("")
+    }
+  )
+})
+
 async function runClient(
+  operation: GitCredentialHelperOperation,
   input: string,
   expectations: (output: string) => void
 ): Promise<void> {
-  const clientProcess = spawn("node", ["./dist/gcf-client.js", "get"], {
+  const clientProcess = spawn("node", ["./dist/gcf-client.js", operation], {
     env: {
       [EnvKey.SERVER]: "localhost:47472"
     }
   })
+
   let outputData = ""
   clientProcess.stdout.on("data", data => {
     outputData += data.toString()
   })
 
-  const done = new Promise(resolve => {
+  const done = new Promise((resolve, reject) => {
     clientProcess.on("close", () => {
-      expectations(outputData)
-      resolve(undefined)
+      try {
+        expectations(outputData)
+        resolve(undefined)
+      } catch (err) {
+        reject(err)
+      }
     })
   })
 
