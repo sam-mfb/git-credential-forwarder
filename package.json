@@ -8,6 +8,7 @@
     "build-mock-git": "rimraf ./src/__tests__/dist && webpack -c ./webpack.mock-git.js",
     "start": "node bin/index.js",
     "test": "jest --watch",
+    "e2e-test": "jest -c ./jest.e2e.config.js",
     "lint": "eslint ./src/",
     "fix-formatting": "prettier --write --config ./prettier.config.js ./src/",
     "check-formatting": "prettier --check --config ./prettier.config.js ./src/"
