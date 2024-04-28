@@ -8,6 +8,7 @@ import { findAvailablePort } from "./findAvailablePort"
 const DEBUG = process.env[EnvKey.DEBUG]
 const LOCALHOST = "127.0.0.1"
 const DOCKER_HOST_IP = "host.docker.internal"
+const GIT_CMD = "git"
 
 const appOutput = buildOutputWriter({ color: "cyan", stream: process.stdout })
 const instructions = buildOutputWriter({
@@ -38,8 +39,18 @@ if (serverType === "tcp" && portEnv) {
 }
 
 ;(async () => {
+  let gitPath = process.env[EnvKey.GIT_PATH]
+  if (gitPath) {
+    errorOutput(
+      `App is using git command at path specified by environmental variable ${EnvKey.GIT_PATH}=${gitPath}. Make sure this is what you intended.`
+    )
+  } else {
+    gitPath = GIT_CMD
+  }
+
   const credentialQuerier = buildCredentialQuerier({
     externalEnv: process.env,
+    gitPath: gitPath,
     debugger: DEBUG
       ? buildOutputWriter({ color: "magenta", stream: process.stdout })
       : undefined
