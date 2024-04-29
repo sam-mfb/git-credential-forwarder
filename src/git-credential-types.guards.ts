@@ -22,6 +22,7 @@ export function isGitCredentialInputOutput(
 ): input is GitCredentialInputOutput {
   return (
     typeof input === "object" &&
+    !Array.isArray(input) &&
     input !== null &&
     ("protocol" in input ? typeof input["protocol"] === "string" : true) &&
     ("host" in input ? typeof input["host"] === "string" : true) &&

@@ -64,6 +64,18 @@ export type GitCredentialOutput<TAction extends GitCredentialAction> =
     ? GitCredentialInputOutput
     : null
 
+export const gitCredentialIoKeys = [
+  "protocol",
+  "host",
+  "path",
+  "username",
+  "password",
+  "password_expiry_utc",
+  "oauth_refresh_token",
+  "url",
+  "wwwauth"
+]
+
 /*
  * Input/output format for git-credential and git credential helpers as specified here https://git-scm.com/docs/git-credential
  */
