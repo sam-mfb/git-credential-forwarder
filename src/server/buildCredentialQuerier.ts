@@ -17,6 +17,7 @@ export function buildCredentialQuerier(deps: {
   // credential helpers, e.g., git-credential-manager, to work
   // correctly
   externalEnv: NodeJS.ProcessEnv
+  gitPath: string
   debugger?: (str: string) => void
 }): CredentialOperationHandler {
   const debug = deps.debugger ? deps.debugger : () => {}
@@ -28,6 +29,7 @@ export function buildCredentialQuerier(deps: {
           gitCredentialAction.FILL,
           input,
           deps.externalEnv,
+          deps.gitPath,
           debug
         )
       case gitCredentialHelperOperation.STORE:
@@ -35,6 +37,7 @@ export function buildCredentialQuerier(deps: {
           gitCredentialAction.APPROVE,
           input,
           deps.externalEnv,
+          deps.gitPath,
           debug
         )
       case gitCredentialHelperOperation.ERASE:
@@ -42,6 +45,7 @@ export function buildCredentialQuerier(deps: {
           gitCredentialAction.REJECT,
           input,
           deps.externalEnv,
+          deps.gitPath,
           debug
         )
       default:
@@ -55,20 +59,20 @@ async function runCredentialAction(
   action: GitCredentialAction,
   input: GitCredentialInputOutput,
   externalEnv: NodeJS.ProcessEnv,
+  gitCmd: string,
   debug: (str: string) => void
 ): Promise<GitCredentialInputOutput> {
   const env = {
     ...externalEnv,
     GIT_TERMINAL_PROMPT: "0"
   }
-  const GIT_CMD = "git"
   const GIT_CREDENTIAL_ARG = "credential"
   const inputSerialized = gitCredentialIoApi.serialize(input)
   debug(
-    `Running shell command: "echo '${inputSerialized}' | ${GIT_CMD} ${GIT_CREDENTIAL_ARG} ${action}"`
+    `Running shell command: "echo '${inputSerialized}' | ${gitCmd} ${GIT_CREDENTIAL_ARG} ${action}"`
   )
   const { stdout, stderr } = await execAsync(
-    `echo '${inputSerialized}' | ${GIT_CMD} ${GIT_CREDENTIAL_ARG} ${action}`,
+    `echo '${inputSerialized}' | ${gitCmd} ${GIT_CREDENTIAL_ARG} ${action}`,
     {
       encoding: "utf8",
       env

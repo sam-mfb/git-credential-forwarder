@@ -1,4 +1,7 @@
-import type { GitCredentialInputOutput } from "./git-credential-types"
+import {
+  gitCredentialIoKeys,
+  type GitCredentialInputOutput
+} from "./git-credential-types"
 import { isGitCredentialInputOutput } from "./git-credential-types.guards"
 import { Result } from "./result"
 import { CustomError } from "./types"
@@ -28,7 +31,7 @@ function rawIoToJson(io: string): Record<string, unknown> {
     if (line.trim()) {
       // Check if the line is not just whitespace
       const [key, value] = line.split("=") // Split each line into key and value at the '=' character
-      if (key && value) {
+      if (key && gitCredentialIoKeys.includes(key) && value) {
         // Ensure both key and value are present
         result[key.trim()] = value.trim() // Trim whitespace and add to result object
       }
@@ -45,7 +48,9 @@ function jsonToRawIo(json: Record<string, unknown>): string {
     if (json.hasOwnProperty(key)) {
       // Check if the key is actually a property of the object and not from its prototype chain
       const value = json[key]
-      result.push(`${key}=${value}`) // Format as 'key=value' and add to the result array
+      if (value) {
+        result.push(`${key}=${value}`) // Format as 'key=value' and add to the result array
+      }
     }
   }
 
