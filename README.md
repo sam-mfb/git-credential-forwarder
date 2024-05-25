@@ -40,6 +40,7 @@ Run git normally and all requests for credentials should be passed through to th
 Notes:
 
 - You can turn on more verbose debugging information by setting the environmental variable `GIT_CREDENTIAL_FORWARDER_DEBUG` to `true`
+- You can explicitly specify the path to your `git` executable by setting the environmental variable `GIT_CREDENTIAL_FORWARDER_GIT_PATH`. This shouldn't be necessary if `git` is in your `PATH`.
 
 ### Using a Dockerfile
 
@@ -55,6 +56,7 @@ RUN unzip git-credential-forwarder.zip
 RUN git config --global credential.helper '!f(){ node ~/gcf-client.js $*; }; f'
 ENV GIT_CREDENTIAL_FORWARDER_SERVER host.docker.internal:[PORT]
 ```
+
 Of course, replace `[VERSION]` and `[PORT]` with the actual version number and port number (or use Docker's `ARG` command).
 
 Note that you may need to add some other things to your git configuration. For example, to work with Azure DevOps OAuth2 authentication add:
@@ -69,7 +71,7 @@ By default the server uses a tcp server listening on `localhost`. You can tell i
 
 On the client/container side, you need to bind mount the socket into your container and then run `export GIT_CREDENTIAL_FORWARDER_SERVER="/path/to/socket"`.
 
-Note that this will not work from a Mac OS host per [this Docker issue](https://github.com/Docker/for-mac/issues/483), which is a signficant limitation.
+Note that this will not work from a Mac OS host per [this Docker issue](https://github.com/Docker/for-mac/issues/483), which is a significant limitation.
 
 ## Debugging
 
@@ -83,14 +85,10 @@ Nothing is perfectly secure, but I have tried to think through the security impl
 
 - OK, the above point isn't entirely correct. At least when the server is running in tcp mode (which is the default), in theory it is less secure than the `git credential fill` scenario because an attacker only needs to be running as _any user_ on your machine that has access to localhost, rather than as you (which they would need to run the direct `git credential` attack). I don't think that's a huge expansion of the threat model, at least for a developer on their own machine, but I'm interested in thinking of ways to make that harder.
 
+- If you want to forward credentials between machines, DO NOT edit the server script to listen on a non-localhost interface. Instead, continue to listen on the localhost interface and use some secure means for forwarding that, e.g., `ssh`
+
 - A key aspect of this utility is that the credentials will only exist in memory, i.e., the chain of `container-git <-> client-helper <-> server-helper <-> host-git` is ephemeral and will be destroyed when the processes shut down. That should limit the threat exposure to the same as when you normally run git (i.e., if someone can dump your memory they could dump your git memory as well). But it is worth thinking through places where the credentials could get accidentally stored to disk:
-  - When you have debug mode turned on. The helper tries to sanitize debug login to avoid this, but it is still a risk.
+  - When you have debug mode turned on. The helper sanitizes debug login to minimize this risk.
   - Crash dumps. I'm not aware of any way to crash this app in a way that will dump credentials, but it's a vector to keep in mind.
-  - Other? I can't think of any other way, but let me know if you can...
 
-## To Do
-
-- Test more extensively. Mostly it's only be tested on Azure Devops and GitHub using git credential manager as the host credential helper.
-- Make the install easier.
-- More tests.
-- Maybe some utilities to make setting up the Docker part easier to do as part of a Dockerfile
+NB: If you believe there is a security issue with the app, please reach out to me directly via email, which is just `sam` at my company's domain.
