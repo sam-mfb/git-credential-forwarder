@@ -8,7 +8,8 @@ import {
 import { gitCredentialIoApi } from "../gitcredential-io"
 import { Result } from "../result"
 
-const TEST_PASSWORD = "myMockSecretPassword"
+// tests can use this to set up the password return
+const TEST_PASSWORD = process.env.TEST_PASSWORD
 
 const firstArg = process.argv[2]
 const secondArg = process.argv[3]
