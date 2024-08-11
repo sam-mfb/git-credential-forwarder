@@ -35,6 +35,7 @@ export const Result = {
     type: ResultType.failure as const,
     error
   }),
-  isFailure: <E = Error>(result: Result<any, E>): result is ResultFailure<E> =>
-    result.type === ResultType.failure
+  isFailure: <E = Error>(
+    result: Result<unknown, E>
+  ): result is ResultFailure<E> => result.type === ResultType.failure
 }

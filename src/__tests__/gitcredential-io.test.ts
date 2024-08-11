@@ -82,6 +82,19 @@ describe(`${gitCredentialIoApi.serialize.name}`, () => {
     expect(result).toBe(expectedString)
   })
 
+  it("is robust to attempts to overwrite hasOwnProperty prototype property", () => {
+    const inputShadowingProto = {
+      protocol: "https",
+      host: "example.com",
+      hasOwnProperty: 1
+    }
+    const expectedString = "protocol=https\nhost=example.com\nhasOwnProperty=1"
+
+    const result = gitCredentialIoApi.serialize(inputShadowingProto)
+
+    expect(result).toBe(expectedString)
+  })
+
   it("handles empty GitCredentialInputOutput object without errors", () => {
     const emptyInput = {}
     const expectedString = ""
