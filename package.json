@@ -6,7 +6,7 @@
   "scripts": {
     "build": "rimraf ./dist && webpack",
     "build-mock-git": "rimraf ./src/__tests__/dist && webpack -c ./webpack.mock-git.js",
-    "start": "node bin/index.js",
+    "zip": "zip -j dist/git-credential-forwarder.zip dist/gcf-*",
     "test": "jest --watch",
     "e2e-test": "jest -c ./jest.e2e.config.js",
     "lint": "eslint .",
