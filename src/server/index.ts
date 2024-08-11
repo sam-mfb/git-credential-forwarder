@@ -73,7 +73,7 @@ if (serverType === "tcp" && portEnv) {
         socketPath: socket
       }
       break
-    case "tcp":
+    case "tcp": {
       if (userSpecifiedPort) {
         appOutput(`Attempting to use user specified port ${userSpecifiedPort}`)
       }
@@ -85,6 +85,7 @@ if (serverType === "tcp" && portEnv) {
         port
       }
       break
+    }
   }
   const credentialReceiver = buildCredentialReceiver(deps)
   switch (deps.type) {

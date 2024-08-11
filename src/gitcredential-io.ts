@@ -45,7 +45,7 @@ function jsonToRawIo(json: Record<string, unknown>): string {
   const result: string[] = [] // Initialize an empty array to hold the key-value pairs
 
   for (const key in json) {
-    if (json.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(json, key)) {
       // Check if the key is actually a property of the object and not from its prototype chain
       const value = json[key]
       if (value) {

@@ -90,4 +90,3 @@ describe(isGitCredentialInputOutput.name, () => {
     expect(isGitCredentialInputOutput(invalidInput)).toBeFalsy()
   })
 })
-
