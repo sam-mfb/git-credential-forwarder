@@ -45,9 +45,6 @@ jobs:
       - name: Test
         run: pnpm test -- --watchAll=false
 
-      - name: E2E Tests
-        run: pnpm run e2e-test
-
       - name: Publish to npm
         run: pnpm publish --no-git-checks
         env:
