@@ -3,18 +3,49 @@
   "version": "1.2.0",
   "description": "utilities for forwarding git credential helper commands to another git installation (e.g. container to host)",
   "main": "dist/index.js",
+  "bin": {
+    "git-credential-forwarder-server": "./dist/gcf-server.js",
+    "git-credential-forwarder-client": "./dist/gcf-client.js",
+    "gcf-server": "./dist/gcf-server.js",
+    "gcf-client": "./dist/gcf-client.js"
+  },
   "scripts": {
-    "build": "rimraf ./dist && webpack",
+    "build": "rimraf ./dist && webpack && node ./add-shebang.js",
     "build-mock-git": "rimraf ./src/__tests__/dist && webpack -c ./webpack.mock-git.js",
     "zip": "zip -j dist/git-credential-forwarder.zip dist/gcf-*",
     "test": "jest --watch",
     "e2e-test": "jest -c ./jest.e2e.config.js",
     "lint": "eslint .",
     "fix-formatting": "prettier --write --config ./prettier.config.js ./src/",
-    "check-formatting": "prettier --check --config ./prettier.config.js ./src/"
+    "check-formatting": "prettier --check --config ./prettier.config.js ./src/",
+    "prepublishOnly": "npm run build && npm run lint && npm test -- --watchAll=false"
   },
   "author": "Sam Davidoff",
   "license": "MIT",
+  "keywords": [
+    "git",
+    "credential",
+    "helper",
+    "docker",
+    "container",
+    "forwarder"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sam-mfb/git-credential-forwarder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sam-mfb/git-credential-forwarder/issues"
+  },
+  "homepage": "https://github.com/sam-mfb/git-credential-forwarder#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE.md"
+  ],
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@types/eslint__js": "^8.42.3",

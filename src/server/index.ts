@@ -110,7 +110,7 @@ if (serverType === "tcp" && portEnv) {
     `Edit your git configuration file inside your docker container to call the git-credential-forwarder client script, for example:\n`
   )
   configOutput(`   [credential]`)
-  configOutput(`     helper = "!f() { node ~/gcf-client.js $*; }; f"\n`)
+  configOutput(`     helper = "!f() { gcf-client $*; }; f"\n`)
 
   try {
     await credentialReceiver()

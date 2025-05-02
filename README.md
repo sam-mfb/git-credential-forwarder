@@ -10,15 +10,45 @@ Because this helper is designed to allow sharing credentials on the same machine
 
 ## Installation and Usage
 
-This helper is written in Typescript and compiles down to two Javascript scripts, one for the server and one for the client.
+This helper is written in TypeScript and can be installed globally via npm or pnpm.
 
-### Download
+### Installation Options
 
-Download the latest release from this repo. The release consists of a filed named `git-credential-forwarder.zip` which contains two Javascript scripts: `gcf-server.js` and `gcf-client.js`. These can be placed wherever you want, but these instructions assume they are placed in the home directories of the host and container.
+#### Global Installation (Recommended)
+
+Install the package globally using npm or pnpm:
+
+```
+npm install -g git-credential-forwarder
+# or
+pnpm add -g git-credential-forwarder
+```
+
+This will make the commands `gcf-server` and `gcf-client` available globally.
+
+#### Manual Download
+
+Alternatively, you can download the latest release from this repo. The release consists of a file named `git-credential-forwarder.zip` which contains two JavaScript scripts: `gcf-server.js` and `gcf-client.js`. These can be placed wherever you want.
+
+After downloading, make the scripts executable:
+
+```
+chmod +x gcf-server.js gcf-client.js
+```
 
 ### On the host
 
-Run `node ~/gcf-server.js`. This will launch the server and it will listen for TCP connections on localhost at a random port which will be displayed in the console. You will need to keep this console/terminal open.
+If installed globally:
+```
+gcf-server
+```
+
+If using manual download:
+```
+./gcf-server.js
+```
+
+This will launch the server and it will listen for TCP connections on localhost at a random port which will be displayed in the console. You will need to keep this console/terminal open.
 
 Notes:
 
@@ -26,13 +56,20 @@ Notes:
 
 ### In the container
 
-Run `export GIT_CREDENTIAL_FORWARDER_SERVER="host.Docker.internal:PORT` where PORT is replaced with the port displayed when you ran the server.
+Run `export GIT_CREDENTIAL_FORWARDER_SERVER="host.docker.internal:PORT"` where PORT is replaced with the port displayed when you ran the server.
 
-Edit your git configuration file to call the client you just complied as a git credential helper, as follows:
+Edit your git configuration file to call the client as a git credential helper:
 
+If installed globally:
 ```
 [credential]
-  helper = "!f() { node ~/gcf-client.js $*; }; f"
+  helper = "!f() { gcf-client $*; }; f"
+```
+
+If using manual download:
+```
+[credential]
+  helper = "!f() { /path/to/gcf-client.js $*; }; f"
 ```
 
 Run git normally and all requests for credentials should be passed through to the host which will handle appropriately on the host side.
@@ -46,14 +83,33 @@ Notes:
 
 Here's a strategy to make this fairly easy to use with a Docker container built with a Dockerfile.
 
+#### Option 1: Using npm or pnpm (Recommended)
+
 On the host, set a specific port that you will listen on by configuring the env variable `GIT_CREDENTIAL_FORWARDER_PORT`.
 
-Add these lines in the Dockerfile
+Add these lines in the Dockerfile:
+
+```
+# Install Node.js and npm/pnpm first if needed
+RUN npm install -g git-credential-forwarder
+# or
+RUN pnpm add -g git-credential-forwarder
+
+RUN git config --global credential.helper '!f(){ gcf-client $*; }; f'
+ENV GIT_CREDENTIAL_FORWARDER_SERVER host.docker.internal:[PORT]
+```
+
+#### Option 2: Using direct download
+
+On the host, set a specific port that you will listen on by configuring the env variable `GIT_CREDENTIAL_FORWARDER_PORT`.
+
+Add these lines in the Dockerfile:
 
 ```
 RUN curl -LO https://github.com/sam-mfb/git-credential-forwarder/releases/download/v[VERSION]/git-credential-forwarder.zip
-RUN unzip git-credential-forwarder.zip
-RUN git config --global credential.helper '!f(){ node ~/gcf-client.js $*; }; f'
+RUN unzip git-credential-forwarder.zip -d /usr/local/bin
+RUN chmod +x /usr/local/bin/gcf-*.js
+RUN git config --global credential.helper '!f(){ /usr/local/bin/gcf-client.js $*; }; f'
 ENV GIT_CREDENTIAL_FORWARDER_SERVER host.docker.internal:[PORT]
 ```
 
