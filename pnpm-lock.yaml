@@ -37,7 +37,7 @@ importers:
         version: 29.2.4(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2))(jest@29.7.0(@types/node@20.14.15))(typescript@5.5.4)
       ts-loader:
         specifier: ^9.5.1
-        version: 9.5.1(typescript@5.5.4)(webpack@5.93.0(webpack-cli@5.1.4))
+        version: 9.5.1(typescript@5.5.4)(webpack@5.93.0)
       typescript:
         specifier: ^5.5.4
         version: 5.5.4
@@ -59,6 +59,10 @@ packages:
 
   '@babel/code-frame@7.24.7':
     resolution: {integrity: sha512-BcYH1CVJBO9tvyIZ2jVeXgSIMvGZ2FDRvDdOIVQyuklNKSsx+eppDEBq/g47Ayw+RqNFE+URvOShmf+f/qwAlA==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/code-frame@7.27.1':
+    resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
     engines: {node: '>=6.9.0'}
 
   '@babel/compat-data@7.25.2':
@@ -99,16 +103,24 @@ packages:
     resolution: {integrity: sha512-pO9KhhRcuUyGnJWwyEgnRJTSIZHiT+vMD0kPeD+so0l7mxkMT19g3pjY9GTnHySck/hDzq+dtW/4VgnMkippsQ==}
     engines: {node: '>=6.9.0'}
 
+  '@babel/helper-string-parser@7.27.1':
+    resolution: {integrity: sha512-qMlSxKbpRlAridDExk92nSobyDdpPijUq2DW6oDnUqd0iOGxmQjyqhMIihI9+zv4LPyZdRje2cavWPbCbWm3eA==}
+    engines: {node: '>=6.9.0'}
+
   '@babel/helper-validator-identifier@7.24.7':
     resolution: {integrity: sha512-rR+PBcQ1SMQDDyF6X0wxtG8QyLCgUB0eRAGguqRLfkCA87l7yAP7ehq8SNj96OOGTO8OBV70KhuFYcIkHXOg0w==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/helper-validator-identifier@7.27.1':
+    resolution: {integrity: sha512-D2hP9eA+Sqx1kBZgzxZh0y1trbuU+JoDkiEwqhQ36nodYqJwyEIhPSdMNd7lOm/4io72luTPWH20Yda0xOuUow==}
     engines: {node: '>=6.9.0'}
 
   '@babel/helper-validator-option@7.24.8':
     resolution: {integrity: sha512-xb8t9tD1MHLungh/AIoWYN+gVHaB9kwlu8gffXGSt3FFEIT7RjS+xWbc2vUD1UTZdIpKj/ab3rdqJ7ufngyi2Q==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/helpers@7.25.0':
-    resolution: {integrity: sha512-MjgLZ42aCm0oGjJj8CtSM3DB8NOOf8h2l7DCTePJs29u+v7yO/RBX9nShlKMgFnRks/Q4tBAe7Hxnov9VkGwLw==}
+  '@babel/helpers@7.27.1':
+    resolution: {integrity: sha512-FCvFTm0sWV8Fxhpp2McP5/W53GPllQ9QeQ7SiqGWjMf/LVG07lFa5+pgK05IRhVwtvafT22KF+ZSnM9I545CvQ==}
     engines: {node: '>=6.9.0'}
 
   '@babel/highlight@7.24.7':
@@ -117,6 +129,11 @@ packages:
 
   '@babel/parser@7.25.3':
     resolution: {integrity: sha512-iLTJKDbJ4hMvFPgQwwsVoxtHyWpKKPBrxkANrSYewDPaPpT5py5yeVkgPIJ7XYXhndxJpaA3PyALSXQ7u8e/Dw==}
+    engines: {node: '>=6.0.0'}
+    hasBin: true
+
+  '@babel/parser@7.27.1':
+    resolution: {integrity: sha512-I0dZ3ZpCrJ1c04OqlNsQcKiZlsrXf/kkE4FXzID9rIOYICsAbA8mMDzhW/luRNAHdCNt7os/u8wenklZDlUVUQ==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -197,12 +214,20 @@ packages:
     resolution: {integrity: sha512-aOOgh1/5XzKvg1jvVz7AVrx2piJ2XBi227DHmbY6y+bM9H2FlN+IfecYu4Xl0cNiiVejlsCri89LUsbj8vJD9Q==}
     engines: {node: '>=6.9.0'}
 
+  '@babel/template@7.27.1':
+    resolution: {integrity: sha512-Fyo3ghWMqkHHpHQCoBs2VnYjR4iWFFjguTDEqA5WgZDOrFesVjMhMM2FSqTKSoUSDO1VQtavj8NFpdRBEvJTtg==}
+    engines: {node: '>=6.9.0'}
+
   '@babel/traverse@7.25.3':
     resolution: {integrity: sha512-HefgyP1x754oGCsKmV5reSmtV7IXj/kpaE1XYY+D9G5PvKKoFfSbiS4M77MdjuwlZKDIKFCffq9rPU+H/s3ZdQ==}
     engines: {node: '>=6.9.0'}
 
   '@babel/types@7.25.2':
     resolution: {integrity: sha512-YTnYtra7W9e6/oAZEHj0bJehPRUlLH9/fbpT5LfB0NhQXyALCRkRs3zH9v07IYhkgpqX6Z78FnuccZr/l4Fs4Q==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/types@7.27.1':
+    resolution: {integrity: sha512-+EzkxvLNfiUeKMgy/3luqfsCWFRXLb7U6wNQTk60tovuckwB15B191tJWvpp4HjiQWdJkCxO3Wbvc6jlk3Xb2Q==}
     engines: {node: '>=6.9.0'}
 
   '@bcoe/v8-coverage@0.2.3':
@@ -1532,6 +1557,9 @@ packages:
   picocolors@1.0.1:
     resolution: {integrity: sha512-anP1Z8qwhkbmu7MFP5iTt+wQKXgwzf7zTyGlcdzabySa9vd0Xt392U0rVmz9poOaBj0uHJKyyo9/upk0HrEQew==}
 
+  picocolors@1.1.1:
+    resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
+
   picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
@@ -1953,6 +1981,12 @@ snapshots:
       '@babel/highlight': 7.24.7
       picocolors: 1.0.1
 
+  '@babel/code-frame@7.27.1':
+    dependencies:
+      '@babel/helper-validator-identifier': 7.27.1
+      js-tokens: 4.0.0
+      picocolors: 1.1.1
+
   '@babel/compat-data@7.25.2': {}
 
   '@babel/core@7.25.2':
@@ -1962,7 +1996,7 @@ snapshots:
       '@babel/generator': 7.25.0
       '@babel/helper-compilation-targets': 7.25.2
       '@babel/helper-module-transforms': 7.25.2(@babel/core@7.25.2)
-      '@babel/helpers': 7.25.0
+      '@babel/helpers': 7.27.1
       '@babel/parser': 7.25.3
       '@babel/template': 7.25.0
       '@babel/traverse': 7.25.3
@@ -2018,14 +2052,18 @@ snapshots:
 
   '@babel/helper-string-parser@7.24.8': {}
 
+  '@babel/helper-string-parser@7.27.1': {}
+
   '@babel/helper-validator-identifier@7.24.7': {}
+
+  '@babel/helper-validator-identifier@7.27.1': {}
 
   '@babel/helper-validator-option@7.24.8': {}
 
-  '@babel/helpers@7.25.0':
+  '@babel/helpers@7.27.1':
     dependencies:
-      '@babel/template': 7.25.0
-      '@babel/types': 7.25.2
+      '@babel/template': 7.27.1
+      '@babel/types': 7.27.1
 
   '@babel/highlight@7.24.7':
     dependencies:
@@ -2037,6 +2075,10 @@ snapshots:
   '@babel/parser@7.25.3':
     dependencies:
       '@babel/types': 7.25.2
+
+  '@babel/parser@7.27.1':
+    dependencies:
+      '@babel/types': 7.27.1
 
   '@babel/plugin-syntax-async-generators@7.8.4(@babel/core@7.25.2)':
     dependencies:
@@ -2114,6 +2156,12 @@ snapshots:
       '@babel/parser': 7.25.3
       '@babel/types': 7.25.2
 
+  '@babel/template@7.27.1':
+    dependencies:
+      '@babel/code-frame': 7.27.1
+      '@babel/parser': 7.27.1
+      '@babel/types': 7.27.1
+
   '@babel/traverse@7.25.3':
     dependencies:
       '@babel/code-frame': 7.24.7
@@ -2131,6 +2179,11 @@ snapshots:
       '@babel/helper-string-parser': 7.24.8
       '@babel/helper-validator-identifier': 7.24.7
       to-fast-properties: 2.0.0
+
+  '@babel/types@7.27.1':
+    dependencies:
+      '@babel/helper-string-parser': 7.27.1
+      '@babel/helper-validator-identifier': 7.27.1
 
   '@bcoe/v8-coverage@0.2.3': {}
 
@@ -2628,17 +2681,17 @@ snapshots:
       '@webassemblyjs/ast': 1.12.1
       '@xtuc/long': 4.2.2
 
-  '@webpack-cli/configtest@2.1.1(webpack-cli@5.1.4(webpack@5.93.0))(webpack@5.93.0(webpack-cli@5.1.4))':
+  '@webpack-cli/configtest@2.1.1(webpack-cli@5.1.4)(webpack@5.93.0)':
     dependencies:
       webpack: 5.93.0(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack@5.93.0)
 
-  '@webpack-cli/info@2.0.2(webpack-cli@5.1.4(webpack@5.93.0))(webpack@5.93.0(webpack-cli@5.1.4))':
+  '@webpack-cli/info@2.0.2(webpack-cli@5.1.4)(webpack@5.93.0)':
     dependencies:
       webpack: 5.93.0(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack@5.93.0)
 
-  '@webpack-cli/serve@2.0.5(webpack-cli@5.1.4(webpack@5.93.0))(webpack@5.93.0(webpack-cli@5.1.4))':
+  '@webpack-cli/serve@2.0.5(webpack-cli@5.1.4)(webpack@5.93.0)':
     dependencies:
       webpack: 5.93.0(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack@5.93.0)
@@ -2728,8 +2781,8 @@ snapshots:
 
   babel-plugin-jest-hoist@29.6.3:
     dependencies:
-      '@babel/template': 7.25.0
-      '@babel/types': 7.25.2
+      '@babel/template': 7.27.1
+      '@babel/types': 7.27.1
       '@types/babel__core': 7.20.5
       '@types/babel__traverse': 7.20.6
 
@@ -3764,6 +3817,8 @@ snapshots:
 
   picocolors@1.0.1: {}
 
+  picocolors@1.1.1: {}
+
   picomatch@2.3.1: {}
 
   pirates@4.0.6: {}
@@ -3933,7 +3988,7 @@ snapshots:
 
   tapable@2.2.1: {}
 
-  terser-webpack-plugin@5.3.10(webpack@5.93.0(webpack-cli@5.1.4)):
+  terser-webpack-plugin@5.3.10(webpack@5.93.0):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
       jest-worker: 27.5.1
@@ -3988,7 +4043,7 @@ snapshots:
       '@jest/types': 29.6.3
       babel-jest: 29.7.0(@babel/core@7.25.2)
 
-  ts-loader@9.5.1(typescript@5.5.4)(webpack@5.93.0(webpack-cli@5.1.4)):
+  ts-loader@9.5.1(typescript@5.5.4)(webpack@5.93.0):
     dependencies:
       chalk: 4.1.2
       enhanced-resolve: 5.17.1
@@ -4049,9 +4104,9 @@ snapshots:
   webpack-cli@5.1.4(webpack@5.93.0):
     dependencies:
       '@discoveryjs/json-ext': 0.5.7
-      '@webpack-cli/configtest': 2.1.1(webpack-cli@5.1.4(webpack@5.93.0))(webpack@5.93.0(webpack-cli@5.1.4))
-      '@webpack-cli/info': 2.0.2(webpack-cli@5.1.4(webpack@5.93.0))(webpack@5.93.0(webpack-cli@5.1.4))
-      '@webpack-cli/serve': 2.0.5(webpack-cli@5.1.4(webpack@5.93.0))(webpack@5.93.0(webpack-cli@5.1.4))
+      '@webpack-cli/configtest': 2.1.1(webpack-cli@5.1.4)(webpack@5.93.0)
+      '@webpack-cli/info': 2.0.2(webpack-cli@5.1.4)(webpack@5.93.0)
+      '@webpack-cli/serve': 2.0.5(webpack-cli@5.1.4)(webpack@5.93.0)
       colorette: 2.0.20
       commander: 10.0.1
       cross-spawn: 7.0.3
@@ -4094,7 +4149,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 3.3.0
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.10(webpack@5.93.0(webpack-cli@5.1.4))
+      terser-webpack-plugin: 5.3.10(webpack@5.93.0)
       watchpack: 2.4.1
       webpack-sources: 3.2.3
     optionalDependencies:
