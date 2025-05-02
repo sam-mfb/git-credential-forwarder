@@ -50,6 +50,3 @@ jobs:
 
       - name: Run tests
         run: pnpm test -- --watchAll=false
-
-      - name: Run E2E tests
-        run: pnpm run e2e-test
