@@ -133,6 +133,21 @@ Note that this will not work from a Mac OS host per [this Docker issue](https://
 
 You can enable debugging on either the server or the client by setting the environmental variable `GIT_CREDENTIAL_FORWARDER_DEBUG` to `true`.
 
+## Development
+
+### Publishing to npm
+
+This project uses GitHub Actions to automatically publish to npm when a new release is created. To set this up:
+
+1. Generate an npm token with publish permissions
+2. Add the token as a GitHub repository secret named `NPM_TOKEN`
+3. Update the version in package.json
+4. Commit the changes and push to GitHub
+5. Create a new tag for the release: `git tag v1.x.x && git push --tags`
+6. Create a new release on GitHub using the tag to trigger the publishing workflow
+
+The GitHub Actions workflow will use pnpm to build, test, and publish the package to the npm registry.
+
 ## Security
 
 Nothing is perfectly secure, but I have tried to think through the security implications of running a helper like this. Here are some thoughts and I would definitely welcome any others in the issues or discussions sections:

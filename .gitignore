@@ -1,2 +1,6 @@
 node_modules
 dist
+*.tgz
+.npmrc
+.npm
+npm-debug.log*
