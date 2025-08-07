@@ -47,19 +47,19 @@
     "LICENSE.md"
   ],
   "devDependencies": {
-    "@eslint/js": "^9.9.0",
+    "@eslint/js": "^9.32.0",
     "@types/eslint__js": "^8.42.3",
     "@types/jest": "^29.5.14",
     "@types/node": "^20.17.32",
-    "eslint": "^9.9.0",
+    "eslint": "^9.32.0",
     "jest": "^29.7.0",
-    "prettier": "^3.5.3",
+    "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
-    "ts-jest": "^29.3.2",
+    "ts-jest": "^29.4.1",
     "ts-loader": "^9.5.2",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.0.1",
-    "webpack": "^5.99.7",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.39.0",
+    "webpack": "^5.101.0",
     "webpack-cli": "^5.1.4"
   }
 }
