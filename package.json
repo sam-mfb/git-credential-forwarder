@@ -1,6 +1,6 @@
 {
   "name": "git-credential-forwarder",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "utilities for forwarding git credential helper commands to another git installation (e.g. container to host)",
   "main": "dist/index.js",
   "bin": {
@@ -59,6 +59,6 @@
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.39.0",
     "webpack": "^5.101.0",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^6.0.1"
   }
 }
