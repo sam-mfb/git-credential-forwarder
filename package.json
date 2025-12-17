@@ -1,6 +1,6 @@
 {
   "name": "git-credential-forwarder",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "utilities for forwarding git credential helper commands to another git installation (e.g. container to host)",
   "main": "dist/index.js",
   "bin": {
@@ -47,18 +47,22 @@
     "LICENSE.md"
   ],
   "devDependencies": {
-    "@eslint/js": "^9.32.0",
+    "@eslint/js": "^9.39.2",
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.2.0",
-    "eslint": "^9.32.0",
-    "jest": "^30.0.5",
-    "prettier": "^3.6.2",
-    "rimraf": "^6.0.1",
-    "ts-jest": "^29.4.1",
-    "ts-loader": "^9.5.2",
-    "typescript": "^5.9.2",
-    "typescript-eslint": "^8.39.0",
-    "webpack": "^5.101.0",
+    "@types/node": "^24.10.4",
+    "eslint": "^9.39.2",
+    "jest": "^30.2.0",
+    "prettier": "^3.7.4",
+    "rimraf": "^6.1.2",
+    "ts-jest": "^29.4.6",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.50.0",
+    "webpack": "^5.104.0",
     "webpack-cli": "^6.0.1"
+  },
+  "overrides": {
+    "glob": ">=10.5.0",
+    "js-yaml": ">=4.1.1"
   }
 }
