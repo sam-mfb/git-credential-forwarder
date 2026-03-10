@@ -66,14 +66,12 @@ async function runCredentialAction(
   const GIT_CREDENTIAL_ARG = "credential"
   const inputSerialized = gitCredentialIoApi.serialize(input)
 
-  const [cmd, ...cmdArgs] = gitCmd.split(/\s+/) as [string, ...string[]]
-  const args = [...cmdArgs, GIT_CREDENTIAL_ARG, action]
+  const fullCmd = `${gitCmd} ${GIT_CREDENTIAL_ARG} ${action}`
 
-  debug(`Running: ${cmd} ${args.join(" ")} (with stdin piping)`)
+  debug(`Running: ${fullCmd} (with stdin piping)`)
 
   const { stdout, stderr } = await spawnWithStdin(
-    cmd,
-    args,
+    fullCmd,
     inputSerialized + "\n",
     env
   ).catch(err => {
@@ -97,13 +95,13 @@ async function runCredentialAction(
 
 function spawnWithStdin(
   cmd: string,
-  args: string[],
   stdinData: string,
   env: NodeJS.ProcessEnv
 ): Promise<{ stdout: string; stderr: string }> {
   return new Promise((resolve, reject) => {
-    const child = spawn(cmd, args, {
+    const child = spawn(cmd, {
       env,
+      shell: true,
       stdio: ["pipe", "pipe", "pipe"]
     })
 

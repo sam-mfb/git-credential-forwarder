@@ -1,5 +1,5 @@
 import { buildCredentialQuerier } from "../server/buildCredentialQuerier"
-import { writeFileSync, unlinkSync, mkdtempSync } from "fs"
+import { writeFileSync, mkdtempSync, rmSync } from "fs"
 import { join } from "path"
 import { tmpdir } from "os"
 
@@ -10,6 +10,10 @@ let tmpDir: string
 
 beforeAll(() => {
   tmpDir = mkdtempSync(join(tmpdir(), "gcf-test-"))
+})
+
+afterAll(() => {
+  rmSync(tmpDir, { recursive: true, force: true })
 })
 
 function writeMockScript(name: string, code: string): string {
