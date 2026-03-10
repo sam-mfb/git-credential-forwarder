@@ -1,4 +1,3 @@
-import { promisify } from "util"
 import {
   GitCredentialAction,
   GitCredentialInputOutput,
@@ -7,10 +6,8 @@ import {
 } from "../git-credential-types"
 import { Result } from "../result"
 import { CredentialOperationHandler } from "../types"
-import { exec } from "child_process"
+import { spawn } from "child_process"
 import { gitCredentialIoApi } from "../gitcredential-io"
-
-const execAsync = promisify(exec)
 
 export function buildCredentialQuerier(deps: {
   // it needs the external env variables for certain external
@@ -68,15 +65,15 @@ async function runCredentialAction(
   }
   const GIT_CREDENTIAL_ARG = "credential"
   const inputSerialized = gitCredentialIoApi.serialize(input)
-  debug(
-    `Running shell command: "echo '${inputSerialized}' | ${gitCmd} ${GIT_CREDENTIAL_ARG} ${action}"`
-  )
-  const { stdout, stderr } = await execAsync(
-    `echo '${inputSerialized}' | ${gitCmd} ${GIT_CREDENTIAL_ARG} ${action}`,
-    {
-      encoding: "utf8",
-      env
-    }
+
+  const fullCmd = `${gitCmd} ${GIT_CREDENTIAL_ARG} ${action}`
+
+  debug(`Running: ${fullCmd} (with stdin piping)`)
+
+  const { stdout, stderr } = await spawnWithStdin(
+    fullCmd,
+    inputSerialized + "\n",
+    env
   ).catch(err => {
     debug(err)
     throw err
@@ -94,4 +91,47 @@ async function runCredentialAction(
       `Error in git action. stderr output: "${stderr}". validation result: "${outputResult.error}"`
     )
   }
+}
+
+function spawnWithStdin(
+  cmd: string,
+  stdinData: string,
+  env: NodeJS.ProcessEnv
+): Promise<{ stdout: string; stderr: string }> {
+  return new Promise((resolve, reject) => {
+    const child = spawn(cmd, {
+      env,
+      shell: true,
+      stdio: ["pipe", "pipe", "pipe"]
+    })
+
+    let stdout = ""
+    let stderr = ""
+
+    child.stdout.on("data", (data: Buffer) => {
+      stdout += data.toString()
+    })
+    child.stderr.on("data", (data: Buffer) => {
+      stderr += data.toString()
+    })
+
+    child.on("error", err => {
+      reject(err)
+    })
+
+    child.on("close", code => {
+      if (code === 0) {
+        resolve({ stdout, stderr })
+      } else {
+        reject(
+          new Error(
+            `Process exited with code ${code}. stderr: "${stderr}"`
+          )
+        )
+      }
+    })
+
+    child.stdin.write(stdinData)
+    child.stdin.end()
+  })
 }

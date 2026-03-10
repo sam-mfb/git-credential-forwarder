@@ -15,6 +15,8 @@ beforeAll(() => {
   serverProcess = spawn("node", ["./dist/gcf-server.js"], {
     detached: true,
     env: {
+      // PATH is needed so spawned child processes (e.g., node) can be found
+      PATH: process.env.PATH,
       // use the mock git app on the server side
       [EnvKey.GIT_PATH]: "node ./src/__tests__/dist/mock-git.js",
       [EnvKey.PORT]: PORT_FOR_TEST_SERVER.toString(),
@@ -73,6 +75,7 @@ async function runClient({
 }): Promise<void> {
   const clientProcess = spawn("node", ["./dist/gcf-client.js", operation], {
     env: {
+      PATH: process.env.PATH,
       [EnvKey.SERVER]: "localhost:" + PORT_FOR_TEST_SERVER.toString()
     }
   })
