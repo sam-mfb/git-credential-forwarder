@@ -4,16 +4,26 @@ on:
   release:
     types: [released]
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '24.x'
           registry-url: 'https://registry.npmjs.org'
-      
+
+      - name: Install latest npm
+        run: npm install -g npm@latest
+
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
@@ -46,6 +56,4 @@ jobs:
         run: pnpm test -- --watchAll=false
 
       - name: Publish to npm
-        run: pnpm publish --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm publish --no-git-checks --provenance --access public
