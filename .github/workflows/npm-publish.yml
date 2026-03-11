@@ -1,59 +1,63 @@
-name: Publish to npm
+name: Publish to NPM
 
 on:
   release:
     types: [released]
 
 permissions:
-  contents: read
   id-token: write
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+          cache: 'npm'
+
+      - name: Update npm
+        run: npm install -g npm@^11.6.2
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test -- --watchAll=false
+
+  publish-npm:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '24.x'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install latest npm
-        run: npm install -g npm@latest
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-          run_install: false
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - uses: actions/cache@v3
-        name: Setup pnpm cache
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+      - name: Update npm
+        run: npm install -g npm@^11.6.2
 
       - name: Install dependencies
-        run: pnpm install
-
-      - name: Lint
-        run: pnpm run lint
+        run: npm ci
 
       - name: Build
-        run: pnpm run build
+        run: npm run build
 
-      - name: Test
-        run: pnpm test -- --watchAll=false
-
-      - name: Publish to npm
-        run: pnpm publish --no-git-checks --provenance --access public
+      - name: Publish to NPM
+        run: npm publish --provenance
