@@ -1,6 +1,6 @@
 {
   "name": "git-credential-forwarder",
-  "version": "1.2.10",
+  "version": "1.2.11",
   "description": "utilities for forwarding git credential helper commands to another git installation (e.g. container to host)",
   "main": "dist/index.js",
   "bin": {
@@ -63,6 +63,7 @@
   },
   "overrides": {
     "glob": ">=10.5.0",
-    "js-yaml": ">=4.1.1"
+    "js-yaml": ">=4.1.1",
+    "fast-uri": ">=3.1.2"
   }
 }
