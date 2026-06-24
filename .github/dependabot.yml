@@ -1,0 +1,24 @@
+version: 2
+updates:
+  # JavaScript/TypeScript dependencies (reads package.json + the
+  # npm/pnpm lockfiles). Security updates are always opened as their
+  # own PRs regardless of the grouping below.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      # Batch routine minor/patch bumps into a single PR to cut noise.
+      dev-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Actions referenced in .github/workflows/*
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
