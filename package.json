@@ -47,7 +47,7 @@
     "LICENSE.md"
   ],
   "devDependencies": {
-    "@eslint/js": "^9.39.4",
+    "@eslint/js": "^10.0.1",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.1.0",
     "eslint": "^10.6.0",
