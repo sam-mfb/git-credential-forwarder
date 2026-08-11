@@ -1,6 +1,6 @@
 {
   "name": "git-credential-forwarder",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "utilities for forwarding git credential helper commands to another git installation (e.g. container to host)",
   "main": "dist/index.js",
   "bin": {
@@ -47,33 +47,33 @@
     "LICENSE.md"
   ],
   "devDependencies": {
-    "@eslint/js": "^9.39.4",
+    "@eslint/js": "^10.0.1",
     "@types/jest": "^30.0.0",
-    "@types/node": "^26.1.0",
-    "eslint": "^10.6.0",
+    "@types/node": "^26.2.0",
+    "eslint": "^10.8.1",
     "jest": "^30.4.2",
-    "prettier": "^3.9.4",
+    "prettier": "^3.9.6",
     "rimraf": "^6.1.3",
-    "ts-jest": "^29.4.11",
+    "ts-jest": "^29.4.12",
     "ts-loader": "^9.6.2",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.63.0",
-    "webpack": "^5.108.4",
-    "webpack-cli": "^7.2.1"
+    "typescript-eslint": "^8.67.0",
+    "webpack": "^5.109.2",
+    "webpack-cli": "^7.2.2"
   },
   "overrides": {
     "glob": ">=10.5.0",
-    "js-yaml": ">=5.0.0",
-    "fast-uri": ">=3.1.2",
-    "brace-expansion": ">=5.0.6",
+    "js-yaml": ">=5.2.2",
+    "fast-uri": ">=4.1.2",
+    "brace-expansion": ">=5.0.9",
     "@babel/core": "^7.29.7"
   },
   "pnpm": {
     "overrides": {
       "glob": ">=10.5.0",
-      "js-yaml": ">=5.0.0",
-      "fast-uri": ">=3.1.2",
-      "brace-expansion": ">=5.0.6",
+      "js-yaml": ">=5.2.2",
+      "fast-uri": ">=4.1.2",
+      "brace-expansion": ">=5.0.9",
       "@babel/core": "^7.29.7"
     }
   }

@@ -86,7 +86,9 @@ export function buildCredentialReceiver(deps: Deps): () => Promise<void> {
           await unlinkAsync(deps.socketPath)
         } catch (error) {
           if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-            throw new Error(`Error removing old socket: ${error}`)
+            throw new Error(`Error removing old socket: ${error}`, {
+              cause: error
+            })
           }
         }
         server.listen(deps.socketPath)
