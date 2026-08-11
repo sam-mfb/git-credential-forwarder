@@ -124,9 +124,7 @@ function spawnWithStdin(
         resolve({ stdout, stderr })
       } else {
         reject(
-          new Error(
-            `Process exited with code ${code}. stderr: "${stderr}"`
-          )
+          new Error(`Process exited with code ${code}. stderr: "${stderr}"`)
         )
       }
     })
