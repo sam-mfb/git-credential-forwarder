@@ -142,11 +142,13 @@ This project uses GitHub Actions to automatically publish to npm when a new rele
 1. Generate an npm token with publish permissions
 2. Add the token as a GitHub repository secret named `NPM_TOKEN`
 3. Update the version in package.json
-4. Commit the changes and push to GitHub
-5. Create a new tag for the release: `git tag v1.x.x && git push --tags`
-6. Create a new release on GitHub using the tag to trigger the publishing workflow
+4. Update both lockfiles: `pnpm install` (for `pnpm-lock.yaml`, used by the test workflow) and `npm install --package-lock-only` (for `package-lock.json`, used by the publish workflow). The publish workflow runs `npm ci`, which fails if `package-lock.json` does not match `package.json`.
+5. Commit the changes and push to GitHub
+6. Create a new tag for the release: `git tag v1.x.x && git push --tags`
+7. Build the release zip from the tag: `git checkout v1.x.x && pnpm build && pnpm zip`. This creates `dist/git-credential-forwarder.zip`, containing `gcf-server.js` and `gcf-client.js`.
+8. Create a new release on GitHub using the tag, and attach `dist/git-credential-forwarder.zip` as a release asset. The "Manual Download" and "Option 2: Using direct download" instructions above depend on this file. Publishing the release triggers the publishing workflow.
 
-The GitHub Actions workflow will use pnpm to build, test, and publish the package to the npm registry.
+The GitHub Actions workflow will use npm to build, test, and publish the package to the npm registry.
 
 ## Security
 
