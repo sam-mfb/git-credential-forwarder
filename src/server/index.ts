@@ -58,6 +58,7 @@ if (serverType === "tcp" && portEnv) {
 
   const baseDeps = {
     credentialOperationHandler: credentialQuerier,
+    errorLogger: errorOutput,
     debugger: DEBUG
       ? buildOutputWriter({ color: "green", stream: process.stdout })
       : undefined
@@ -115,12 +116,16 @@ if (serverType === "tcp" && portEnv) {
   try {
     await credentialReceiver()
   } catch (err) {
-    errorOutput(JSON.stringify(err))
+    errorOutput(`Could not start server: ${errorMessage(err)}`)
     process.exit(1)
   }
 
   appOutput("Ctrl+c to stop server.")
 })().catch(err => {
-  errorOutput(JSON.stringify(err))
+  errorOutput(errorMessage(err))
   process.exit(1)
 })
+
+function errorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err)
+}

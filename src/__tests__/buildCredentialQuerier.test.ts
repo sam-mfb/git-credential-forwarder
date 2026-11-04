@@ -1,5 +1,11 @@
 import { buildCredentialQuerier } from "../server/buildCredentialQuerier"
-import { writeFileSync, mkdtempSync, rmSync } from "fs"
+import {
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync
+} from "fs"
 import { join } from "path"
 import { tmpdir } from "os"
 
@@ -134,5 +140,102 @@ describe("buildCredentialQuerier", () => {
       password: "pass"
     })
     expect(result).toEqual({})
+  })
+})
+
+describe("buildCredentialQuerier: process failures", () => {
+  it("rejects, without an unhandled error, when the process exits without reading stdin", async () => {
+    const script = writeMockScript("exit-now.js", `process.exit(1);`)
+    const handler = buildCredentialQuerier({
+      externalEnv: baseEnv,
+      gitPath: `node ${script}`
+    })
+
+    // large enough that the write cannot finish before the process exits
+    await expect(
+      handler("get", { protocol: "https", path: "x".repeat(2_000_000) })
+    ).rejects.toThrow(/exited with code 1/)
+  })
+
+  it("rejects when the git command does not exist", async () => {
+    const handler = buildCredentialQuerier({
+      externalEnv: baseEnv,
+      gitPath: join(tmpDir, "no-such-git")
+    })
+
+    await expect(
+      handler("get", { protocol: "https", path: "x".repeat(2_000_000) })
+    ).rejects.toThrow(/exited with code/)
+  })
+})
+
+describe("buildCredentialQuerier: cancellation", () => {
+  function isRunning(pid: number): boolean {
+    try {
+      process.kill(pid, 0)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  it("kills the process and rejects when the signal is aborted", async () => {
+    const pidFile = join(tmpDir, "hang.pid")
+    const script = writeMockScript(
+      "hang.js",
+      `
+      require("fs").writeFileSync(${JSON.stringify(pidFile)}, String(process.pid));
+      setInterval(() => {}, 1000);
+    `
+    )
+    const handler = buildCredentialQuerier({
+      externalEnv: baseEnv,
+      gitPath: `node ${script}`
+    })
+    const controller = new AbortController()
+
+    const result = handler("get", { protocol: "https" }, controller.signal)
+    const pid = await new Promise<number>(resolve => {
+      const wait = setInterval(() => {
+        try {
+          const text = readFileSync(pidFile, "utf8")
+          clearInterval(wait)
+          resolve(Number(text))
+        } catch {
+          // not written yet
+        }
+      }, 20)
+    })
+    expect(isRunning(pid)).toBe(true)
+
+    controller.abort()
+
+    await expect(result).rejects.toThrow(/Cancelled/)
+    await new Promise<void>(resolve => {
+      const wait = setInterval(() => {
+        if (!isRunning(pid)) {
+          clearInterval(wait)
+          resolve()
+        }
+      }, 20)
+    })
+    expect(isRunning(pid)).toBe(false)
+  })
+
+  it("does not start the process when the signal is already aborted", async () => {
+    const marker = join(tmpDir, "should-not-exist")
+    const script = writeMockScript(
+      "marker.js",
+      `require("fs").writeFileSync(${JSON.stringify(marker)}, "ran");`
+    )
+    const handler = buildCredentialQuerier({
+      externalEnv: baseEnv,
+      gitPath: `node ${script}`
+    })
+
+    await expect(
+      handler("get", { protocol: "https" }, AbortSignal.abort())
+    ).rejects.toThrow(/Cancelled/)
+    expect(existsSync(marker)).toBe(false)
   })
 })

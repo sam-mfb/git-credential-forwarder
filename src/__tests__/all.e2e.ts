@@ -1,4 +1,5 @@
 import { StdioOptions, execSync, spawn } from "child_process"
+import http from "http"
 import { EnvKey } from "../env"
 import { GitCredentialHelperOperation } from "../git-credential-types"
 
@@ -36,6 +37,34 @@ it("Returns output of host on a valid git credential operation", async () => {
   // makes a 'get' request, that is forwarded to the server, the server
   // passes it to `git`, gets the response, and passes it back to the
   // client
+  return runClient({
+    operation: "get",
+    input: "username=myUser",
+    expectations: output => {
+      expect(output).toEqual(`username=myUser\npassword=${TEST_PASSWORD}`)
+    }
+  })
+})
+
+it("Keeps serving after a request with a malformed body", async () => {
+  const bad = await new Promise<number | undefined>((resolve, reject) => {
+    const req = http.request(
+      {
+        host: "localhost",
+        port: PORT_FOR_TEST_SERVER,
+        method: "POST",
+        path: "/"
+      },
+      res => {
+        res.resume()
+        res.on("end", () => resolve(res.statusCode))
+      }
+    )
+    req.on("error", reject)
+    req.end("{not json")
+  })
+  expect(bad).toBe(400)
+
   return runClient({
     operation: "get",
     input: "username=myUser",
