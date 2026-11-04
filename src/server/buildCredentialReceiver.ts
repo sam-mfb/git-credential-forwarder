@@ -7,6 +7,7 @@ import {
 } from "../types"
 import { gitCredentialIoApi } from "../gitcredential-io"
 import { isCredentialRequestBody } from "../types.guard"
+import { checkCredentialIsSafe } from "../git-credential-safety"
 import { Result } from "../result"
 import { sanitize } from "../sanitize"
 import { promisify } from "util"
@@ -215,6 +216,12 @@ function parseRequestBody(raw: string): Result<CredentialRequestBody, Error> {
     return Result.failure(
       new Error("Request body is not a valid credential request")
     )
+  }
+  // The input is written to `git credential` as key=value lines, so it must
+  // not be able to add lines or attributes of its own.
+  const safety = checkCredentialIsSafe(parsed.input)
+  if (Result.isFailure(safety)) {
+    return safety
   }
   return Result.success(parsed)
 }

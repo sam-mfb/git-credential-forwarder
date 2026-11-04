@@ -74,6 +74,32 @@ it("Keeps serving after a request with a malformed body", async () => {
   })
 })
 
+it("Rejects a credential value that would add a line for git", async () => {
+  const status = await new Promise<number | undefined>((resolve, reject) => {
+    const req = http.request(
+      {
+        host: "localhost",
+        port: PORT_FOR_TEST_SERVER,
+        method: "POST",
+        path: "/"
+      },
+      res => {
+        res.resume()
+        res.on("end", () => resolve(res.statusCode))
+      }
+    )
+    req.on("error", reject)
+    req.end(
+      JSON.stringify({
+        operation: "get",
+        input: { protocol: "https", host: "example.com\nusername=attacker" }
+      })
+    )
+  })
+
+  expect(status).toBe(400)
+})
+
 it("Returns no output on unsupported git command", async () => {
   return runClient({
     // not an actual git command

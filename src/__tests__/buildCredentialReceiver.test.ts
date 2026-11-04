@@ -116,6 +116,32 @@ describe("buildCredentialReceiver: bad request bodies", () => {
   })
 })
 
+describe("buildCredentialReceiver: credential injection", () => {
+  it.each([
+    [
+      "a newline in a value",
+      { protocol: "https", host: "example.com\nusername=attacker" }
+    ],
+    ["a carriage return in a value", { protocol: "https", host: "a\rb" }],
+    ["an unknown key", { "protocol": "https", "x\nhost": "evil.com" }]
+  ])("answers %s with 400 without running the operation", async (_n, input) => {
+    let calls = 0
+    const { socketPath, errors } = await startReceiver(async (_op, i) => {
+      calls++
+      return i
+    })
+
+    const res = await post(
+      socketPath,
+      JSON.stringify({ operation: "get", input })
+    )
+
+    expect(res.status).toBe(400)
+    expect(calls).toBe(0)
+    expect(errors).toHaveLength(1)
+  })
+})
+
 describe("buildCredentialReceiver: request body decoding", () => {
   it("decodes a multi-byte character split across chunks", async () => {
     let received: unknown
