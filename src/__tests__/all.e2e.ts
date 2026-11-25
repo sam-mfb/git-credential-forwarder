@@ -10,8 +10,8 @@ const PORT_FOR_TEST_SERVER = 47472
 const TEST_PASSWORD = "myMockSecretPassword"
 
 beforeAll(() => {
-  execSync(`pnpm build`, { stdio: setupStdio })
-  execSync(`pnpm build-mock-git`, { stdio: setupStdio })
+  execSync(`npm run build`, { stdio: setupStdio })
+  execSync(`npm run build-mock-git`, { stdio: setupStdio })
 
   serverProcess = spawn("node", ["./dist/gcf-server.js"], {
     detached: true,
