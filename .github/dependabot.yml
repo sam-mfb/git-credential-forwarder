@@ -1,7 +1,7 @@
 version: 2
 updates:
-  # JavaScript/TypeScript dependencies (reads package.json + the
-  # npm/pnpm lockfiles). Security updates are always opened as their
+  # JavaScript/TypeScript dependencies (reads package.json and
+  # package-lock.json). Security updates are always opened as their
   # own PRs regardless of the grouping below.
   - package-ecosystem: "npm"
     directory: "/"

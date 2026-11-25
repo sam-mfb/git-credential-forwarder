@@ -4,3 +4,6 @@ dist
 .npmrc
 .npm
 npm-debug.log*
+# This project uses npm; package-lock.json is the only lockfile.
+pnpm-lock.yaml
+yarn.lock
